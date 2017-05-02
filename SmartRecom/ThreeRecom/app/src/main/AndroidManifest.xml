@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.lvr.threerecom">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
+
+    <application
+        android:name=".app.AppApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/icon_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.movie.MovieDisplayActivity"></activity>
+        <activity android:name=".ui.login.SignUpActivity"/>
+        <activity android:name=".ui.login.LoginActivity"></activity>
+        <activity android:name=".ui.movie.MovieDetailActivity"></activity>
+        <activity android:name=".ui.movie.MoviePlayActivity"></activity>
+        <activity android:name=".ui.music.MusicActivity"></activity>
+        <activity android:name=".ui.music.MusicSongListDetailActivity"></activity>
+
+        <service
+            android:name=".SensorCollection.service.SensorService"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.sensor.service"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

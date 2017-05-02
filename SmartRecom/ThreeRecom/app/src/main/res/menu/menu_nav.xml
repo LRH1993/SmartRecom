@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <group android:checkableBehavior="single">
+        <item android:title="首页" android:id="@+id/mn_home" android:icon="@drawable/home"></item>
+        <item android:title="我的信息" android:id="@+id/mn_information" android:icon="@drawable/myinformation"></item>
+        <item android:title="猜你喜欢" android:id="@+id/mn_guess" android:icon="@drawable/guess_like"></item>
+        <item android:title="电影" android:id="@+id/mn_movie" android:icon="@drawable/movie"></item>
+        <item android:title="音乐" android:id="@+id/mn_music" android:icon="@drawable/music"></item>
+
+
+    </group>
+    <item android:title="更多">
+        <menu>
+            <item
+                android:id="@+id/mn_change"
+                android:icon="@drawable/change"
+                android:title="主题切换"/>
+            <item
+                android:id="@+id/mn_about"
+                android:icon="@drawable/about"
+                android:title="关于"/>
+            <item android:title="注销"
+                  android:id="@+id/mn_out"
+                  android:icon="@drawable/out">
+            </item>
+        </menu>
+    </item>
+</menu>

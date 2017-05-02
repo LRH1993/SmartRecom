@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_marginTop="10dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/iv_hot_hint"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/home_hot_hint"/>
+    <TextView
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_toRightOf="@+id/iv_hot_hint"
+        android:layout_marginLeft="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:id="@+id/tv_name_rec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="今日推荐  ·  电影"/>
+    <TextView
+        android:layout_marginRight="5dp"
+        android:id="@+id/tv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="更多"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"/>
+
+
+
+</RelativeLayout>

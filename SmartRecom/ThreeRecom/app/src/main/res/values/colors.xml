@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="accent_material_light">#e57a00</color>
+    <color name="background_material_light_1">#fafafa</color>
+    <color name="toast_white">#ffffff</color>
+    <color name="menu_item_white">#FFFFFF</color>
+    <color name="small_font">#FF757575</color>
+    <color name="listTextColor">#ff333333</color>
+    <color name="listSubTextColor">#ff888888</color>
+    <color name="menu_item_grey">#ffdbdbdb</color>
+    <color name="toast_stroke_gray">#E7E7E7</color>
+    <color name="time_line">#CCCCCC</color>
+    <color name="black">#FF000000</color>
+    <color name="whaite_text">#fafafa</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary_text_white">#deffffff</color>
+    <color name="text_color">#FF000000</color>
+    <color name="red">#FFFF0000</color>
+    <color name="green">#FF00FF00</color>
+    <color name="gray">#FFF0F0F0</color>
+    <color name="gray_deep">#c9000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="role_right_gray">#929292</color>
+    <color name="role_yellow_gray">#33CC99</color>
+    <color name="container_background">#EBEBEB</color>
+</resources>

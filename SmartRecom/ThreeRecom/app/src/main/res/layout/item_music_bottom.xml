@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="55dp">
+    <ImageView
+        android:layout_marginTop="2dp"
+        android:id="@+id/iv_music_list"
+        android:background="@color/colorPrimary"
+        android:src="@drawable/music_list_default"
+        android:scaleType="centerInside"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
+    <LinearLayout
+        android:layout_marginLeft="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/iv_music_list_menu"
+        android:layout_toRightOf="@+id/iv_music_list"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_music_list_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="我喜欢的歌曲"
+            android:textColor="@color/black"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/tv_music_list_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="0首"
+            android:textColor="@color/small_font"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/iv_music_list_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/music_list_menu" />
+
+
+</RelativeLayout>

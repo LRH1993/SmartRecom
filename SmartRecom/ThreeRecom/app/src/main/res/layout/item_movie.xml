@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="5dp"
+    android:id="@+id/rl_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView
+        android:id="@+id/cd_info"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="4dp"
+        android:clickable="false"
+        app:cardCornerRadius="3dp"
+        app:cardElevation="8dp">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/iv_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:transitionName="@string/transition_movie_photos"/>
+            <TextView
+                android:textSize="18sp"
+                android:padding="5dp"
+                android:textColor="@color/accent_material_light"
+                android:layout_gravity="left|bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_rating"
+                android:text="5.6"/>
+            <ImageView
+                android:id="@+id/iv_hot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/movie_hot"
+                android:layout_gravity="right"/>
+        </FrameLayout>
+
+    </android.support.v7.widget.CardView>
+    <TextView
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:id="@+id/tv_name"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cd_info"
+        android:text="Tory store"/>
+</RelativeLayout>

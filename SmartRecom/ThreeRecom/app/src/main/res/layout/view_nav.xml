@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:fitsSystemWindows="false"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@drawable/nav_header"
+                >
+    <com.lvr.threerecom.widget.CircleImageView
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:civ_border_width="2dp"
+        android:id="@+id/iv_user_photo"
+        android:src="@drawable/nav_photo"
+        android:layout_above="@+id/tv_login"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textSize="12sp"
+        android:text="点击头像登录"
+        android:textColor="@color/white"
+        android:padding="8dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:id="@+id/tv_login"
+        android:layout_alignParentBottom="true"/>
+
+
+
+</RelativeLayout>

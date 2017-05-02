@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:id="@+id/iv_ranking_photo"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="centerCrop"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:orientation="vertical"
+            android:padding="5dp"
+            >
+            <TextView
+                android:id="@+id/tv_rank_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="新歌榜"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                />
+            <TextView
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:id="@+id/tv_rank_first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="1.知足"
+                android:textColor="#7D7D7D"
+                android:textSize="12sp"
+                />
+
+            <TextView
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:id="@+id/tv_rank_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="2.温柔"
+                android:textColor="#7D7D7D"
+                android:textSize="12sp"
+                />
+
+            <TextView
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:id="@+id/tv_rank_third"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="3.干杯"
+                android:textColor="#7D7D7D"
+                android:textSize="12sp"
+                />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

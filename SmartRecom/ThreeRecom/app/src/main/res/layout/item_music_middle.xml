@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/menu_item_grey"
+                android:orientation="vertical">
+    <ImageView
+        android:src="@drawable/list_expand_arrow_down"
+        android:id="@+id/iv_expand_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:text="创建的歌单(1)"
+        android:id="@+id/iv_expand_title"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/iv_expand_img"
+        android:gravity="center"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/iv_expand_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:src="@drawable/list_expand_menu" />
+
+</RelativeLayout>

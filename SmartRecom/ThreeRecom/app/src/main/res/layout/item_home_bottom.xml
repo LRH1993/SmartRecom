@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_marginTop="10dp"
+             android:layout_marginBottom="10dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    <ImageView
+        android:background="@color/black"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="1dp">
+    </ImageView>
+    <com.lvr.threerecom.widget.SuperTextView
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="我是有底线的"/>
+
+</FrameLayout>

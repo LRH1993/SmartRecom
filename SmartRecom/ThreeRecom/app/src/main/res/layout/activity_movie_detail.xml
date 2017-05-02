@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="256dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="@color/colorPrimary"
+            app:expandedTitleMarginEnd="@dimen/title_margin"
+            app:expandedTitleMarginStart="@dimen/title_margin"
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:statusBarScrim="@android:color/transparent">
+
+            <ImageView
+                android:src="@mipmap/ic_launcher"
+                android:id="@+id/iv_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                android:scaleType="fitCenter"
+                android:transitionName="@string/transition_movie_photos"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7"
+                tools:targetApi="lollipop"/>
+
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/container_background"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="傲慢与偏见"
+                android:textSize="20sp"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:elevation="10dp"
+                app:cardCornerRadius="5dp">
+
+                <TextView
+                    android:id="@+id/tv_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="3.2"
+                    android:textColor="@color/accent_material_light"/>
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/ll_intro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_name"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_genres"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="喜剧/爱情"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/tv_release"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="上映时间：2017-04-02"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_function"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ll_intro"
+                android:layout_marginTop="100dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <com.lvr.threerecom.widget.SuperTextView
+                    android:id="@+id/tv_watch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50dp"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="观看"
+                    android:textColor="@color/accent_material_light"
+                    android:textSize="20sp"
+                    app:corner="10dp"
+                    app:left_bottom_corner="true"
+                    app:left_top_corner="true"
+                    app:right_bottom_corner="true"
+                    app:right_top_corner="true"
+                    app:stroke_color="@color/accent_material_light"
+                    app:stroke_width="2dp"/>
+
+                <com.lvr.threerecom.widget.SuperTextView
+                    android:id="@+id/tv_judge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="评价"
+                    android:textColor="@color/accent_material_light"
+                    android:textSize="20sp"
+                    app:corner="10dp"
+                    app:left_bottom_corner="true"
+                    app:left_top_corner="true"
+                    app:right_bottom_corner="true"
+                    app:right_top_corner="true"
+                    app:stroke_color="@color/accent_material_light"
+                    app:stroke_width="2dp"
+                    app:text_fill_color="@color/accent_material_light"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

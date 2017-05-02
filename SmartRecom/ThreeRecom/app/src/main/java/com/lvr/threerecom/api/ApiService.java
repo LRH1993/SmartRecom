@@ -1,0 +1,80 @@
+package com.lvr.threerecom.api;
+
+import com.lvr.threerecom.bean.MovieInfo;
+import com.lvr.threerecom.bean.RankingListItem;
+import com.lvr.threerecom.bean.SongDetailInfo;
+import com.lvr.threerecom.bean.SongListDetail;
+import com.lvr.threerecom.bean.WrapperSongListInfo;
+
+import java.util.List;
+import java.util.Map;
+
+import io.reactivex.Observable;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
+import retrofit2.http.Query;
+
+/**
+ * Created by lvr on 2017/4/22.
+ */
+
+public interface ApiService {
+    public static final String MOVIE_BASE_URL_TYPE = "http://121.42.174.147:8080/RecommendMovie/";
+    public static final String MOVIE_BASE_URL_HOT = "http://121.42.174.147:8080/RecommendMovie/";
+    public static final String MUSIC_BASE_URL = "http://tingapi.ting.baidu.com/v1/restserver/";
+
+    //获取具体种类的电影
+    @GET("getMoviesByPage.action")
+    Observable<Map<String, List<MovieInfo>>> getMoiveByType(
+            @Query("pageSize") int pageSize, @Query("pageNow") int pageNow,
+            @Query("type") String type, @Query("genres") String genres);
+
+    //获取热门电影
+    @GET("getHotMovies.action")
+    Observable<Map<String, List<MovieInfo>>> getHotMoive();
+
+
+    @FormUrlEncoded
+    @POST("user/edit")
+    Observable<Map<String, String>> updateLogin(@Field("usernumber") int phoneNumber, @Field("password") String password);
+
+
+    //获取全部歌单
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<WrapperSongListInfo> getSongListAll(@Query("format") String format,
+                                                   @Query("from") String from,
+                                                   @Query("method") String method,
+                                                   @Query("page_size") int page_size,
+                                                   @Query("page_no") int page_no);
+
+    //获取全部榜单
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<RankingListItem> getRankingListAll(@Query("format") String format,
+                                                  @Query("from") String from,
+                                                  @Query("method") String method,
+                                                  @Query("kflag") int kflag);
+
+    //获取某个歌单中的信息
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<SongListDetail> getSongListDetail(@Query("format") String format,
+                                                 @Query("from") String from,
+                                                 @Query("method") String method,
+                                                 @Query("listid") String listid);
+
+    //获取某个歌曲的信息
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<SongDetailInfo> getSongDetail(@Query("format") String format,
+                                             @Query("from") String from,
+                                             @Query("method") String method,
+                                             @Query("songid") String songid,
+                                             @Query("ts") String ts,
+                                             @Query("e") String e);
+
+}
