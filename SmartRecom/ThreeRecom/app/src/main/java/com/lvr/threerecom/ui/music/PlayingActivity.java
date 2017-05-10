@@ -32,6 +32,7 @@ import com.lvr.threerecom.adapter.MusicPlayingViewPagerAdapter;
 import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.base.BaseFragment;
+import com.lvr.threerecom.bean.SongUpdateInfo;
 import com.lvr.threerecom.broadcastreceiver.ProgressReceiver;
 import com.lvr.threerecom.service.MediaPlayService;
 import com.lvr.threerecom.service.MediaServiceConnection;
@@ -46,6 +47,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 
 /**
  * Created by lvr on 2017/5/2.
@@ -100,6 +103,7 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
     private MediaServiceConnection mConnection;
     private boolean isLocal = false;
     private ProgressReceiver mReceiver;
+    private int mPosition;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -134,6 +138,7 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
             mTitle = (String) extras.get("title");
             mAuthor = (String) extras.get("author");
             mPicUrl = (String) extras.get("picUrl");
+            mPosition = (int) extras.get("position");
         }
         setToolBar();
         setUI();
@@ -143,6 +148,10 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.lvr.progress");
         registerReceiver(mReceiver,filter);
+        //注册监听更新UI的事件
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
     }
 
     private void setViewPager() {
@@ -153,6 +162,57 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
         mFragmentList.add(roundFragment);
         mPagerAdapter = new MusicPlayingViewPagerAdapter(getSupportFragmentManager(), mFragmentList);
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setCurrentItem(0);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                updateData();
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position-mPosition==-1){
+                    mConnection.mMediaPlayService.pre(isLocal);
+                }
+                if(position-mPosition==1){
+                    mConnection.mMediaPlayService.next(isLocal);
+                }
+                mPosition =position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+    }
+
+    /**
+     * 更新歌曲信息
+     */
+    private void updateData() {
+        if(mFragmentList.size()==1){
+            if(mConnection.mMediaPlayService==null){
+                return;
+            }
+            List<SongUpdateInfo> list = mConnection.mMediaPlayService.getPlayingList();
+            mFragmentList.clear();
+            for(int i=0;i<list.size();i++){
+                SongUpdateInfo updateInfo = list.get(i);
+                String url = updateInfo.getPicUrl();
+                RoundFragment roundFragment = new RoundFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("picUrl", url);
+                roundFragment.setArguments(bundle);
+                mFragmentList.add(roundFragment);
+            }
+            mPagerAdapter.notifyDataSetChanged();
+            mViewPager.setCurrentItem(mPosition);
+        }
     }
 
     private void setUI() {
@@ -174,6 +234,51 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
         mIvPlayingPlay.setOnClickListener(this);
         mIvPlayingNext.setOnClickListener(this);
         mIvPlayingPre.setOnClickListener(this);
+        mSbPlaySeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBar.setProgress(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                mConnection.mMediaPlayService.seekTo(progress);
+            }
+        });
+
+    }
+
+    /**
+     * 更新UI事件的接收
+     * @param info 歌曲信息
+     */
+    @Subscribe
+    public void onUpdateUIEvent(SongUpdateInfo info) {
+        System.out.println("接收到更新UI的消息");
+        String title = info.getTitle();
+        String author = info.getAuthor();
+        String url = info.getPicUrl();
+        int position = info.getCurPosition();
+        int totalPosition = info.getTotalPosition();
+        mActionBar.setTitle(title + "---" + author);
+        mSbPlaySeek.setMax(totalPosition);
+        SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+        String total = format.format(totalPosition);
+        String curPosition = format.format(position);
+        mTvMusicDuration.setText(total);
+        mTvMusicDurationPlayed.setText(curPosition);
+        if (!TextUtils.isEmpty(url)) {
+            new PathAsyncTask(mIvAlbumart).execute(url);
+        }
+        System.out.println("歌曲索引："+info.getIndex());
+        updateData();
+        mViewPager.setCurrentItem(info.getIndex());
 
 
     }
@@ -195,7 +300,12 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_playing_next: {
-                mConnection.mMediaPlayService.next(isLocal);
+                int item = mViewPager.getCurrentItem();
+                updateData();
+                if(item==mFragmentList.size()){
+                    return;
+                }
+                mViewPager.setCurrentItem(item+1);
                 break;
             }
             case R.id.iv_playing_play: {
@@ -213,7 +323,11 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
                 break;
             }
             case R.id.iv_playing_pre: {
-                mConnection.mMediaPlayService.pre(isLocal);
+                int item = mViewPager.getCurrentItem();
+                if(item==0){
+                    return;
+                }
+                mViewPager.setCurrentItem(item-1);
             }
         }
 

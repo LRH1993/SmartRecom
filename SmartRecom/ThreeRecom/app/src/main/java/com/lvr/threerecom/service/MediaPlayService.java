@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.bean.SongDetailInfo;
+import com.lvr.threerecom.bean.SongUpdateInfo;
 import com.lvr.threerecom.client.NetworkUtil;
 import com.lvr.threerecom.ui.music.PlayingActivity;
 
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by lvr on 2017/5/2.
@@ -41,8 +44,11 @@ public class MediaPlayService extends Service {
     private int currentTime = 0;
     //播放歌曲在列表中的索引
     private int position = 0;
+    //当前歌曲的时长
+    private int duration = 0;
     private AudioManager mAm;
     private boolean isPlayAll = false;
+    private boolean flag = true;
     //创建单线程池
     private ExecutorService es = Executors.newSingleThreadExecutor();
 
@@ -118,7 +124,7 @@ public class MediaPlayService extends Service {
                 int position = mediaPlayer.getCurrentPosition();
                 //发送广播 通知PlayActivity界面更新UI
                 Intent intent = new Intent();
-                intent.putExtra("progress",position);
+                intent.putExtra("progress", position);
                 intent.setAction("com.lvr.progress");
                 sendBroadcast(intent);
                 SystemClock.sleep(500);
@@ -130,10 +136,13 @@ public class MediaPlayService extends Service {
      * 播放
      */
     public void playSong(int position, boolean isLocal) {
+        this.position = position;
         SongDetailInfo info = musicsList.get(position);
         if (mSongDetailInfo == null || !info.getSonginfo().getSong_id().equals(mSongDetailInfo.getSonginfo().getSong_id())) {
             //不是同一首歌
-            mSongDetailInfo.setOnClick(false);
+            if (mSongDetailInfo != null) {
+                mSongDetailInfo.setOnClick(false);
+            }
             mSongDetailInfo = info;
         }
 
@@ -146,7 +155,7 @@ public class MediaPlayService extends Service {
             startPlayingActivity(mSongDetailInfo);
 
         }
-        
+
 
     }
 
@@ -169,11 +178,27 @@ public class MediaPlayService extends Service {
         //封面
         String picUrl = info.getSonginfo().getPic_premium();
         intent.putExtra("duration", duration);
+        intent.putExtra("position",position);
         intent.putExtra("curPostion", currentTime);
         intent.putExtra("title", title);
         intent.putExtra("author", author);
         intent.putExtra("picUrl", picUrl);
         startActivity(intent);
+    }
+    /**
+     * 给PlayingActivity传送SongUpdateInfo列表
+     */
+    public List<SongUpdateInfo> getPlayingList(){
+        List<SongUpdateInfo> list = new ArrayList<>();
+        for(int i=0;i<musicsList.size();i++){
+            SongDetailInfo info = musicsList.get(i);
+            SongUpdateInfo updateInfo = new SongUpdateInfo();
+            updateInfo.setAuthor(info.getSonginfo().getAuthor());
+            updateInfo.setTitle(info.getSonginfo().getTitle());
+            updateInfo.setPicUrl(info.getSonginfo().getPic_premium());
+            list.add(updateInfo);
+        }
+        return list;
     }
 
 
@@ -200,7 +225,7 @@ public class MediaPlayService extends Service {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mediaPlayer.start();
-
+                        duration = mediaPlayer.getDuration();
                     }
                 });
 
@@ -235,6 +260,7 @@ public class MediaPlayService extends Service {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mediaPlayer.start();
+                        duration = mediaPlayer.getDuration();
                         startPlayingActivity(mSongDetailInfo);
                     }
                 });
@@ -254,12 +280,12 @@ public class MediaPlayService extends Service {
         setPlayAll(true);
 
         SongDetailInfo info = musicsList.get(0);
-        System.out.println("播放歌曲 ："+info.getSonginfo().getTitle());
+        System.out.println("播放歌曲 ：" + info.getSonginfo().getTitle());
         if (mSongDetailInfo == null || !info.getSonginfo().getSong_id().equals(mSongDetailInfo.getSonginfo().getSong_id())) {
             //不是同一首歌
             mSongDetailInfo = info;
         }
-        
+
         if (isPlayAll) {
             mediaPlayer.reset();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -314,6 +340,7 @@ public class MediaPlayService extends Service {
     MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer player) {
+            System.out.println("音乐播放完毕");
             if (!player.isLooping() && !isPlayAll) {
                 mAm.abandonAudioFocus(onAudioFocusChangeListener);
                 mSongDetailInfo.setOnClick(false);
@@ -325,7 +352,7 @@ public class MediaPlayService extends Service {
             } else if (player.isLooping()) {
                 //循环播放
             }
-            
+
         }
     };
 
@@ -341,7 +368,7 @@ public class MediaPlayService extends Service {
     /**
      * 清空播放集合
      */
-    public void clearMusicList(){
+    public void clearMusicList() {
         musicsList.clear();
     }
 
@@ -393,6 +420,21 @@ public class MediaPlayService extends Service {
 
     }
 
+    /**
+     * 拖动Seekbar音乐跳转
+     *
+     * @param position
+     */
+    public void seekTo(int position) {
+        if (null == mediaPlayer) return;
+        mediaPlayer.seekTo(position);
+        if (position < duration) {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+            }
+        }
+    }
+
 
     /**
      * 播放下一首
@@ -405,18 +447,14 @@ public class MediaPlayService extends Service {
         if (musicsList.size() > 0) {
             position++;
             if (position < musicsList.size()) {//当前歌曲的索引小于歌曲集合的长度
-                
+                System.out.println("目前歌曲位置："+position);
                 playSong(position, isLocal);
-                
+
             } else {
                 //循环从第一首开始播放
                 position = 0;
-                SongDetailInfo info = musicsList.get(position);
-                mSongDetailInfo = info;
-                mSongDetailInfo.setOnClick(true);
-                mediaPlayer.reset();
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                play(info.getBitrate().getFile_link(), false);
+
+                playSong(position, isLocal);
             }
 
             updatePlayingUI(mSongDetailInfo);
@@ -425,9 +463,32 @@ public class MediaPlayService extends Service {
 
     /**
      * 更新正在播放歌曲的UI
+     *
      * @param info 歌曲信息
      */
     private void updatePlayingUI(SongDetailInfo info) {
+        flag = true;
+        final SongUpdateInfo updateInfo = new SongUpdateInfo();
+        updateInfo.setAuthor(info.getSonginfo().getAuthor());
+        updateInfo.setTitle(info.getSonginfo().getTitle());
+        updateInfo.setPicUrl(info.getSonginfo().getPic_premium());
+        updateInfo.setCurPosition(mediaPlayer.getCurrentPosition());
+        updateInfo.setIndex(position);
+
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                if (flag) {
+                    System.out.println("即将发送的歌曲消息索引："+updateInfo.getIndex());
+                    updateInfo.setTotalPosition(mediaPlayer.getDuration());
+                    mediaPlayer.start();
+                    EventBus.getDefault().post(updateInfo);
+                    flag = false;
+                }
+            }
+        });
+
 
     }
 
@@ -442,9 +503,11 @@ public class MediaPlayService extends Service {
         if (musicsList.size() > 0) {
             position--;
             if (position >= 0) {//大于等于0的情况
-                playSong(position,isLocal);
+                playSong(position, isLocal);
             } else {
-               playSong(0,isLocal);
+                position = 0;
+                mSongDetailInfo.setOnClick(false);
+                playSong(position, isLocal);
             }
         }
         updatePlayingUI(mSongDetailInfo);

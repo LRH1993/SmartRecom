@@ -220,9 +220,14 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
             if (mService == null) {
                 mService = mMediaBinder.getMediaPlayService();
             }
-            String song_id = info.getSonginfo().getSong_id();
-            Integer position = positionMap.get(song_id);
-            mInfos[position] = info;
+
+            if(info.getSonginfo()==null){
+                // TODO: 2017/5/10 为空 不能播放 后续需要处理 
+            }else{
+                String song_id = info.getSonginfo().getSong_id();
+                Integer position = positionMap.get(song_id);
+                mInfos[position] = info;
+            }
             index++;
             if (index == mInfos.length) {
                 for (int i = 0; i < mInfos.length; i++) {
@@ -244,7 +249,6 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
     public void onItemClick(int position) {
         //播放单个
         isPlayAll = false;
-        System.out.println("播放单个");
         if (mService != null) {
             mService.setPlayAll(false);
             mService.playSong(position, isLocal);
