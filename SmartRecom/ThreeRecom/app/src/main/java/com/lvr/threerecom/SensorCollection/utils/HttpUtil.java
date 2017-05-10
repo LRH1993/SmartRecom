@@ -1,4 +1,4 @@
-package com.lvr.threerecom.SensorCollection.utils;
+package com.lvr.threerecom.sensorcollection.utils;
 
 import android.util.Log;
 

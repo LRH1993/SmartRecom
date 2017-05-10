@@ -218,6 +218,7 @@ public class SongListDetail {
         private String share;
         private String is_charge;
 
+
         public String getTitle() {
             return title;
         }

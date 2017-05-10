@@ -28,15 +28,26 @@
         <activity android:name=".ui.movie.MoviePlayActivity"></activity>
         <activity android:name=".ui.music.MusicActivity"></activity>
         <activity android:name=".ui.music.MusicSongListDetailActivity"></activity>
+        <activity android:name=".ui.music.PlayingActivity"></activity>
+
 
         <service
-            android:name=".SensorCollection.service.SensorService"
+            android:name=".sensorcollection.service.SensorService"
             android:process=":remote">
             <intent-filter>
                 <action android:name="com.sensor.service"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </service>
+
+        <service android:name=".service.MediaPlayService"></service>
+
+
+        <receiver android:name=".broadcastreceiver.ProgressReceiver">
+            <intent-filter>
+                <action android:name="com.lvr.progress"></action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

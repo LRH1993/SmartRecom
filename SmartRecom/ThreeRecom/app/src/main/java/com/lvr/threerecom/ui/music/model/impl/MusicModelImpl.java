@@ -57,9 +57,9 @@ public class MusicModelImpl implements MusicModel {
     }
 
     @Override
-    public Observable<SongDetailInfo> loadSongDetail(String format, String from, String method, String songid, String ts, String e) {
+    public Observable<SongDetailInfo> loadSongDetail(String from,String version,String format, String method, String songid) {
         RetrofitClient retrofitClient = RetrofitClient.getInstance(AppApplication.getAppContext(), ApiService.MUSIC_BASE_URL);
         ApiService api = retrofitClient.create(ApiService.class);
-        return api.getSongDetail(format, from, method, songid, ts, e).compose(RetrofitClient.schedulersTransformer);
+        return api.getSongDetail(from,version,format,  method, songid).compose(RetrofitClient.schedulersTransformer);
     }
 }

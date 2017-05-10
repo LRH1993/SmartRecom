@@ -29,6 +29,7 @@ public class MusicSongListDetailPresenterImpl implements MusicSongListDetailPres
         this.mMusicModel = new MusicModelImpl();
         this.mContext = context;
     }
+
     @Override
     public void requestSongListDetail(String format, String from, String method, String listid) {
         Observable<List<SongListDetail.SongDetail>> observable = mMusicModel.loadSongListDetail(format, from, method, listid);
@@ -56,8 +57,8 @@ public class MusicSongListDetailPresenterImpl implements MusicSongListDetailPres
     }
 
     @Override
-    public void requestSongDetail(String format, String from, String method, String songid, String ts, String e) {
-        Observable<SongDetailInfo> observable = mMusicModel.loadSongDetail(format, from, method, songid, ts, e);
+    public void requestSongDetail(String from, String version, String format, String method, String songid) {
+        Observable<SongDetailInfo> observable = mMusicModel.loadSongDetail(from, version, format, method, songid);
         observable.subscribe(new Observer<SongDetailInfo>() {
             @Override
             public void onSubscribe(Disposable d) {

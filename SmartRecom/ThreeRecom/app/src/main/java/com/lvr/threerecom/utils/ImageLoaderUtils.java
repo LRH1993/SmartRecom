@@ -86,8 +86,8 @@ public class ImageLoaderUtils {
         }
         Glide.with(context).load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .error(R.drawable.toux2)
-                .centerCrop().transform(new GlideRoundTransformUtil(context)).into(imageView);
+                .error(R.drawable.ic_empty_picture).
+                centerCrop().transform(new GlideRoundTransformUtil(context)).into(imageView);
     }
 
 }

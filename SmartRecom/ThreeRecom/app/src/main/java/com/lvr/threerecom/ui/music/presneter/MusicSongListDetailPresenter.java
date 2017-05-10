@@ -6,5 +6,5 @@ package com.lvr.threerecom.ui.music.presneter;
 
 public interface MusicSongListDetailPresenter {
     void requestSongListDetail(String format,String from,String method, String listid);
-    void requestSongDetail(String format, String from, String method,String songid,String ts,String e);
+    void requestSongDetail(String from,String version,String format, String method,String songid);
 }

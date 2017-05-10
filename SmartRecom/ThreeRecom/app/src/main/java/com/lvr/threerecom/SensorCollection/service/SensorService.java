@@ -1,4 +1,4 @@
-package com.lvr.threerecom.SensorCollection.service;
+package com.lvr.threerecom.sensorcollection.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,13 +17,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.lvr.threerecom.R;
-import com.lvr.threerecom.SensorCollection.listener.SensorListener;
-import com.lvr.threerecom.SensorCollection.observer.SensorObserver;
-import com.lvr.threerecom.SensorCollection.observer.SensorObserverable;
-import com.lvr.threerecom.SensorCollection.utils.Constant;
-import com.lvr.threerecom.SensorCollection.utils.HttpUtil;
-import com.lvr.threerecom.SensorCollection.utils.JSONUtil;
-import com.lvr.threerecom.SensorCollection.utils.SensorUtil;
+import com.lvr.threerecom.sensorcollection.listener.SensorListener;
+import com.lvr.threerecom.sensorcollection.observer.SensorObserver;
+import com.lvr.threerecom.sensorcollection.observer.SensorObserverable;
+import com.lvr.threerecom.sensorcollection.utils.Constant;
+import com.lvr.threerecom.sensorcollection.utils.HttpUtil;
+import com.lvr.threerecom.sensorcollection.utils.JSONUtil;
+import com.lvr.threerecom.sensorcollection.utils.SensorUtil;
 import com.lvr.threerecom.app.AppConstantValue;
 
 import java.util.ArrayList;

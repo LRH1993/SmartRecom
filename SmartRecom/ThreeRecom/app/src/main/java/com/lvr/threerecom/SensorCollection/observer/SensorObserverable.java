@@ -1,4 +1,4 @@
-package com.lvr.threerecom.SensorCollection.observer;
+package com.lvr.threerecom.sensorcollection.observer;
 
 import java.util.Vector;
 

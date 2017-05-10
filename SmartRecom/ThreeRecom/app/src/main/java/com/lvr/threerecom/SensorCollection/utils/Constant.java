@@ -1,4 +1,4 @@
-package com.lvr.threerecom.SensorCollection.utils;
+package com.lvr.threerecom.sensorcollection.utils;
 
 /**
  * Created by caoliang on 2017/3/9.

@@ -1,12 +1,15 @@
 package com.lvr.threerecom.ui.music;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -20,12 +23,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aspsine.irecyclerview.IRecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.lvr.threerecom.R;
+import com.lvr.threerecom.service.MediaPlayService;
 import com.lvr.threerecom.adapter.MusicSongListDetailAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
@@ -36,14 +39,15 @@ import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
 import com.lvr.threerecom.ui.music.presneter.impl.MusicSongListDetailPresenterImpl;
 import com.lvr.threerecom.ui.music.view.MusicSongListDetailView;
-import com.lvr.threerecom.utils.AESTools;
 import com.lvr.threerecom.utils.ImageLoaderUtils;
 import com.lvr.threerecom.utils.StatusBarSetting;
+import com.lvr.threerecom.widget.LoadingDialog;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -53,7 +57,7 @@ import butterknife.BindView;
  * Created by lvr on 2017/4/27.
  */
 
-public class MusicSongListDetailActivity extends BaseActivityWithoutStatus implements MusicSongListDetailView, MusicSongListDetailAdapter.onItemClickListener {
+public class MusicSongListDetailActivity extends BaseActivityWithoutStatus implements MusicSongListDetailView, MusicSongListDetailAdapter.onItemClickListener, MusicSongListDetailAdapter.onPlayAllClickListener {
 
     @BindView(R.id.overlay)
     View mOverlay;
@@ -107,6 +111,18 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
     private MusicSongListDetailPresenterImpl mPresenter;
     private MusicSongListDetailAdapter mDetailAdapter;
     private List<SongListDetail.SongDetail> mList = new ArrayList<>();
+    private Intent mIntent;
+    private static MediaPlayService.MediaBinder mMediaBinder;
+    private List<SongListDetail.SongDetail> mMReturnList;
+    private MediaPlayService mService;
+    private boolean isPlayAll = false;
+    private MediaServiceConnection mConnection;
+    //song_id 对应的在集合中的位置
+    private HashMap<String, Integer> positionMap = new HashMap<>();
+    //请求返回的SongDetailInfo先存放在数组中，对应下标索引是其在集合中所处位置
+    private SongDetailInfo[] mInfos;
+    //指示现在加入musicList集合中的元素下标应该是多少
+    private int index = 0;
 
     @Override
     public int getLayoutId() {
@@ -143,7 +159,19 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
         setUI();
         setRecyclerView();
         mDetailAdapter.setOnItemClickListener(this);
+        mDetailAdapter.setOnPlayAllClickListener(this);
 
+
+    }
+
+    private void initMusicList() {
+        for (int i = 0; i < mList.size(); i++) {
+            SongListDetail.SongDetail songDetail = mList.get(i);
+            String song_id = songDetail.getSong_id();
+            positionMap.put(song_id, i);
+            mPresenter.requestSongDetail(AppConstantValue.MUSIC_URL_FROM_2, AppConstantValue.MUSIC_URL_VERSION, AppConstantValue.MUSIC_URL_FORMAT, AppConstantValue.MUSIC_URL_METHOD_SONG_DETAIL
+                    , song_id);
+        }
     }
 
     private void setUI() {
@@ -158,6 +186,12 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
         }
         mTvSonglistDetail.setText(stringBuffer);
         new PathAsyncTask(mAlbumArt).execute(photoUrl);
+        mConnection = new MediaServiceConnection();
+        if (mIntent == null) {
+            mIntent = new Intent(this, MediaPlayService.class);
+            startService(mIntent);
+            bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+        }
     }
 
     private void setRecyclerView() {
@@ -166,31 +200,82 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
         mIrvSongDetail.setItemAnimator(new LandingAnimator());
         mIrvSongDetail.setIAdapter(new ScaleInAnimationAdapter(mDetailAdapter));
         mIrvSongDetail.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
+        LoadingDialog.showDialogForLoading(this).show();
         mPresenter.requestSongListDetail(AppConstantValue.MUSIC_URL_FORMAT, AppConstantValue.MUSIC_URL_FROM, AppConstantValue.MUSIC_URL_METHOD_SONGLIST_DETAIL, songListid);
 
     }
 
     @Override
     public void returnSongListDetailInfos(List<SongListDetail.SongDetail> songDetails) {
-        System.out.println("接收到歌单中歌曲信息：" + songDetails.size());
         mList.addAll(songDetails);
+        //初始化数组集合
+        mInfos = new SongDetailInfo[mList.size()];
         mDetailAdapter.notifyDataSetChanged();
+        initMusicList();
     }
 
     @Override
     public void returnSongDetail(SongDetailInfo info) {
-        System.out.println("接收到歌曲详细信息");
-        Toast.makeText(mContext, "还不能播放，很快就会实现！", Toast.LENGTH_SHORT).show();
-        
+        if (mMediaBinder != null) {
+            if (mService == null) {
+                mService = mMediaBinder.getMediaPlayService();
+            }
+            String song_id = info.getSonginfo().getSong_id();
+            Integer position = positionMap.get(song_id);
+            mInfos[position] = info;
+            index++;
+            if (index == mInfos.length) {
+                for (int i = 0; i < mInfos.length; i++) {
+                    if(i==0){
+                        //先清除之前的播放集合
+                        mService.clearMusicList();
+                    }
+                    mService.addMusicList(mInfos[i]);
+                }
+            }
+
+            LoadingDialog.cancelDialogForLoading();
+        }
+
+
     }
 
     @Override
-    public void onItemClick(String songid) {
-        long millis = System.currentTimeMillis();
-        String str = "songid=" + songid + "&ts=" + millis;
-        String e = AESTools.encrpty(str);
-        mPresenter.requestSongDetail(AppConstantValue.MUSIC_URL_FORMAT, AppConstantValue.MUSIC_URL_FROM, AppConstantValue.MUSIC_URL_METHOD_SONG_DETAIL
-                , songid, millis + "", e);
+    public void onItemClick(int position) {
+        //播放单个
+        isPlayAll = false;
+        System.out.println("播放单个");
+        if (mService != null) {
+            mService.setPlayAll(false);
+            mService.playSong(position, isLocal);
+        }
+
+    }
+
+    @Override
+    public void onItemClick(List<SongListDetail.SongDetail> songDetails) {
+        //播放全部
+        isPlayAll = true;
+        if (mService != null) {
+            mService.playAll(isLocal);
+        }
+
+
+    }
+
+
+    private static class MediaServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMediaBinder = (MediaPlayService.MediaBinder) service;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
     }
 
     private static class PathAsyncTask extends AsyncTask<String, Void, String> {
@@ -256,5 +341,9 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
 
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mConnection);
+    }
 }

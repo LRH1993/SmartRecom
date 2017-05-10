@@ -70,11 +70,10 @@ public interface ApiService {
     //获取某个歌曲的信息
     @GET("ting")
     @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-    Observable<SongDetailInfo> getSongDetail(@Query("format") String format,
-                                             @Query("from") String from,
+    Observable<SongDetailInfo> getSongDetail(@Query("from") String from,
+                                             @Query("version") String version,
+                                             @Query("format") String format,
                                              @Query("method") String method,
-                                             @Query("songid") String songid,
-                                             @Query("ts") String ts,
-                                             @Query("e") String e);
+                                             @Query("songid") String songid);
 
 }

@@ -1,11 +1,11 @@
-package com.lvr.threerecom.SensorCollection.listener;
+package com.lvr.threerecom.sensorcollection.listener;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
-import com.lvr.threerecom.SensorCollection.observer.SensorObserverable;
-import com.lvr.threerecom.SensorCollection.utils.Constant;
+import com.lvr.threerecom.sensorcollection.observer.SensorObserverable;
+import com.lvr.threerecom.sensorcollection.utils.Constant;
 
 import java.io.Serializable;
 import java.util.ArrayList;

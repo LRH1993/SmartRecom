@@ -25,6 +25,7 @@ public class MusicSongListDetailAdapter extends RecyclerView.Adapter<RecyclerVie
     private static final int TYPE_HEAD = 0;
     private static final int TYPE_LIST = 1;
     private onItemClickListener mOnItemClickListener;
+    private onPlayAllClickListener mOnPlayAllClickListener;
     public MusicSongListDetailAdapter(Context context, List<SongListDetail.SongDetail> list) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
@@ -50,7 +51,7 @@ public class MusicSongListDetailAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if(holder instanceof HeaderViewHolder){
             ((HeaderViewHolder) holder).mTvPlayNumber.setText("(共"+list.size()+"首)");
         }else {
@@ -63,8 +64,7 @@ public class MusicSongListDetailAdapter extends RecyclerView.Adapter<RecyclerVie
             ((ListViewHolder) holder).mRlSong.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String id = detail.getSong_id();
-                    mOnItemClickListener.onItemClick(id);
+                    mOnItemClickListener.onItemClick(position-1);
                 }
             });
         }
@@ -88,7 +88,7 @@ public class MusicSongListDetailAdapter extends RecyclerView.Adapter<RecyclerVie
             mRlPlayAll.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    mOnPlayAllClickListener.onItemClick(list);
                 }
             });
             mIvSetting.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +127,12 @@ public class MusicSongListDetailAdapter extends RecyclerView.Adapter<RecyclerVie
         this.mOnItemClickListener = onItemClickListener;
     }
     public interface  onItemClickListener{
-        void onItemClick(String songid);
+        void onItemClick(int position);
+    }
+    public void setOnPlayAllClickListener(onPlayAllClickListener onPlayAllClickListener){
+        this.mOnPlayAllClickListener = onPlayAllClickListener;
+    }
+    public interface  onPlayAllClickListener{
+        void onItemClick(List<SongListDetail.SongDetail> songDetails);
     }
 }

@@ -17,5 +17,5 @@ public interface MusicModel {
     Observable<List<WrapperSongListInfo.SongListInfo>> loadSongListAll(String format, String from, String method, int page_size, int page_no);
     Observable<List<RankingListItem.RangkingDetail>> loadRankingListAll(String format, String from, String method,int kflag);
     Observable<List<SongListDetail.SongDetail>> loadSongListDetail(String format, String from, String method, String listid);
-    Observable<SongDetailInfo> loadSongDetail(String format, String from, String method,String songid,String ts,String e);
+    Observable<SongDetailInfo> loadSongDetail(String from,String version,String format, String method,String songid);
 }
