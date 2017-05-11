@@ -27,10 +27,17 @@ public class ProgressReceiver extends BroadcastReceiver {
             return;
         }
         Bundle extras = intent.getExtras();
-        int position = (int) extras.get("progress");
         Message message = Message.obtain();
-        message.arg1 = position;
+        if(extras.get("progress")!=null){
+            int position = (int) extras.get("progress");
+            message.arg1 = position;
+        }
+        if(extras.get("max")!=null){
+            int max = (int) extras.get("max");
+            message.arg2 = max;
+        }
         mHandler.sendMessage(message);
+
 
     }
 }

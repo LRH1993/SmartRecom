@@ -13,8 +13,10 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.lvr.threerecom.app.AppApplication;
+import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongUpdateInfo;
+import com.lvr.threerecom.bean.UpdateViewPagerBean;
 import com.lvr.threerecom.client.NetworkUtil;
 import com.lvr.threerecom.ui.music.PlayingActivity;
 
@@ -24,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,6 +54,8 @@ public class MediaPlayService extends Service {
     private boolean flag = true;
     //创建单线程池
     private ExecutorService es = Executors.newSingleThreadExecutor();
+    //播放状态 默认是列表循环
+    private int play_mode = AppConstantValue.PLAYING_MODE_REPEAT_ALL;
 
     @Override
     public void onCreate() {
@@ -101,8 +106,7 @@ public class MediaPlayService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        //开启更新线程
-        es.execute(progressRunnable);
+
         return new MediaBinder();
     }
 
@@ -124,6 +128,7 @@ public class MediaPlayService extends Service {
                 int position = mediaPlayer.getCurrentPosition();
                 //发送广播 通知PlayActivity界面更新UI
                 Intent intent = new Intent();
+                intent.putExtra("max",duration);
                 intent.putExtra("progress", position);
                 intent.setAction("com.lvr.progress");
                 sendBroadcast(intent);
@@ -168,9 +173,9 @@ public class MediaPlayService extends Service {
         Intent intent = new Intent(MediaPlayService.this, PlayingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //时长
-        int duration = mediaPlayer.getDuration();
+        int duration = 0;
         //当前位置
-        int currentTime = mediaPlayer.getCurrentPosition();
+        int currentTime = 0;
         //歌曲名称
         String title = info.getSonginfo().getTitle();
         //演唱者
@@ -224,8 +229,11 @@ public class MediaPlayService extends Service {
                 mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        mediaPlayer.start();
-                        duration = mediaPlayer.getDuration();
+                        mp.start();
+                        currentTime = mp.getCurrentPosition();
+                        duration = mp.getDuration();
+                        //发送广播 通知PlayActivity界面更新UI
+                        es.execute(progressRunnable);
                     }
                 });
 
@@ -259,8 +267,11 @@ public class MediaPlayService extends Service {
                 mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        mediaPlayer.start();
-                        duration = mediaPlayer.getDuration();
+                        mp.start();
+                        currentTime = mp.getCurrentPosition();
+                        duration = mp.getDuration();
+                        //发送广播 通知PlayActivity界面更新UI
+                        es.execute(progressRunnable);
                         startPlayingActivity(mSongDetailInfo);
                     }
                 });
@@ -278,9 +289,7 @@ public class MediaPlayService extends Service {
      */
     public void playAll(boolean isLocal) {
         setPlayAll(true);
-
         SongDetailInfo info = musicsList.get(0);
-        System.out.println("播放歌曲 ：" + info.getSonginfo().getTitle());
         if (mSongDetailInfo == null || !info.getSonginfo().getSong_id().equals(mSongDetailInfo.getSonginfo().getSong_id())) {
             //不是同一首歌
             mSongDetailInfo = info;
@@ -341,20 +350,45 @@ public class MediaPlayService extends Service {
         @Override
         public void onCompletion(MediaPlayer player) {
             System.out.println("音乐播放完毕");
-            if (!player.isLooping() && !isPlayAll) {
-                mAm.abandonAudioFocus(onAudioFocusChangeListener);
+            if(play_mode==AppConstantValue.PLAYING_MODE_REPEAT_ALL){
+                //列表循环
                 mSongDetailInfo.setOnClick(false);
-            } else if (isPlayAll) {
-                //播放全部 此时只要从列表中播放下一首即可
-                mSongDetailInfo.setOnClick(false);
-
-                next(false);
-            } else if (player.isLooping()) {
-                //循环播放
+                EventBus.getDefault().post(new UpdateViewPagerBean());
             }
+            if(play_mode ==AppConstantValue.PLAYING_MODE_REPEAT_CURRENT){
+                //单曲循环
+                mSongDetailInfo.setOnClick(false);
+                playSong(position,false);
+            }
+            if(play_mode ==AppConstantValue.PLAYING_MODE_SHUFFLE_NORMAL){
+                //随机播放
+                mSongDetailInfo.setOnClick(false);
+                int temp = new Random().nextInt(musicsList.size());
+                position = temp;
+                playSong(position,false);
+            }
+
 
         }
     };
+
+    /**
+     * 设置播放模式
+     * @param state 播放模式
+     */
+    public void setPlayMode(int state){
+        play_mode = state;
+    }
+
+    /**
+     * 获得当前的播放模式
+     * @return 播放模式
+     */
+    public int getPlayMode(){
+        return  play_mode;
+    }
+
+
 
     /**
      * 向集合中添加待播放歌曲
@@ -428,11 +462,11 @@ public class MediaPlayService extends Service {
     public void seekTo(int position) {
         if (null == mediaPlayer) return;
         mediaPlayer.seekTo(position);
-        if (position < duration) {
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-            }
-        }
+//        if (position < duration) {
+//            if (!mediaPlayer.isPlaying()) {
+//                mediaPlayer.start();
+//            }
+//        }
     }
 
 
@@ -440,6 +474,7 @@ public class MediaPlayService extends Service {
      * 播放下一首
      */
     public void next(boolean isLocal) {
+        System.out.println("next方法的调用");
         currentTime = 0;
         if (position < 0) {
             position = 0;
@@ -447,16 +482,12 @@ public class MediaPlayService extends Service {
         if (musicsList.size() > 0) {
             position++;
             if (position < musicsList.size()) {//当前歌曲的索引小于歌曲集合的长度
-                System.out.println("目前歌曲位置："+position);
-                playSong(position, isLocal);
 
             } else {
                 //循环从第一首开始播放
                 position = 0;
-
-                playSong(position, isLocal);
             }
-
+            playSong(position, isLocal);
             updatePlayingUI(mSongDetailInfo);
         }
     }
@@ -472,22 +503,11 @@ public class MediaPlayService extends Service {
         updateInfo.setAuthor(info.getSonginfo().getAuthor());
         updateInfo.setTitle(info.getSonginfo().getTitle());
         updateInfo.setPicUrl(info.getSonginfo().getPic_premium());
-        updateInfo.setCurPosition(mediaPlayer.getCurrentPosition());
         updateInfo.setIndex(position);
+        System.out.println("发送更新UI的消息，索引为："+position);
+        EventBus.getDefault().post(updateInfo);
 
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                if (flag) {
-                    System.out.println("即将发送的歌曲消息索引："+updateInfo.getIndex());
-                    updateInfo.setTotalPosition(mediaPlayer.getDuration());
-                    mediaPlayer.start();
-                    EventBus.getDefault().post(updateInfo);
-                    flag = false;
-                }
-            }
-        });
 
 
     }
@@ -531,7 +551,7 @@ public class MediaPlayService extends Service {
             mediaPlayer.release();
         }
         es.shutdownNow();
-
+        mAm.abandonAudioFocus(onAudioFocusChangeListener);
     }
 
 

@@ -24,15 +24,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.adapter.MusicPlayingViewPagerAdapter;
 import com.lvr.threerecom.app.AppApplication;
+import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.base.BaseFragment;
 import com.lvr.threerecom.bean.SongUpdateInfo;
+import com.lvr.threerecom.bean.UpdateViewPagerBean;
 import com.lvr.threerecom.broadcastreceiver.ProgressReceiver;
 import com.lvr.threerecom.service.MediaPlayService;
 import com.lvr.threerecom.service.MediaServiceConnection;
@@ -104,15 +107,25 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
     private boolean isLocal = false;
     private ProgressReceiver mReceiver;
     private int mPosition;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            int position = msg.arg1;
-            SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-            String cur = format.format(position);
-            mTvMusicDurationPlayed.setText(cur);
-            mSbPlaySeek.setProgress(position);
+            if (msg.arg1 != 0) {
+                int position = msg.arg1;
+                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+                String cur = format.format(position);
+                mTvMusicDurationPlayed.setText(cur);
+                mSbPlaySeek.setProgress(position);
+            }
+            if (msg.arg2 != 0) {
+                int max = msg.arg2;
+                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+                String total = format.format(max);
+                mTvMusicDuration.setText(total);
+                mSbPlaySeek.setMax(max);
+            }
+
         }
     };
 
@@ -147,9 +160,9 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
         mReceiver = new ProgressReceiver(mHandler);
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.lvr.progress");
-        registerReceiver(mReceiver,filter);
+        registerReceiver(mReceiver, filter);
         //注册监听更新UI的事件
-        if(!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
     }
@@ -173,13 +186,13 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
 
             @Override
             public void onPageSelected(int position) {
-                if(position-mPosition==-1){
+                if (position - mPosition == -1) {
                     mConnection.mMediaPlayService.pre(isLocal);
                 }
-                if(position-mPosition==1){
+                if (position - mPosition == 1) {
                     mConnection.mMediaPlayService.next(isLocal);
                 }
-                mPosition =position;
+                mPosition = position;
             }
 
             @Override
@@ -195,13 +208,13 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
      * 更新歌曲信息
      */
     private void updateData() {
-        if(mFragmentList.size()==1){
-            if(mConnection.mMediaPlayService==null){
+        if (mFragmentList.size() == 1) {
+            if (mConnection.mMediaPlayService == null) {
                 return;
             }
             List<SongUpdateInfo> list = mConnection.mMediaPlayService.getPlayingList();
             mFragmentList.clear();
-            for(int i=0;i<list.size();i++){
+            for (int i = 0; i < list.size(); i++) {
                 SongUpdateInfo updateInfo = list.get(i);
                 String url = updateInfo.getPicUrl();
                 RoundFragment roundFragment = new RoundFragment();
@@ -222,18 +235,13 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
             bindService(mIntent, mConnection, BIND_AUTO_CREATE);
         }
         mActionBar.setTitle(mTitle + "---" + mAuthor);
-        mSbPlaySeek.setMax(mDuration);
-        SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-        String total = format.format(mDuration);
-        String cur = format.format(mCurPostion);
-        mTvMusicDuration.setText(total);
-        mTvMusicDurationPlayed.setText(cur);
         if (!TextUtils.isEmpty(mPicUrl)) {
             new PathAsyncTask(mIvAlbumart).execute(mPicUrl);
         }
         mIvPlayingPlay.setOnClickListener(this);
         mIvPlayingNext.setOnClickListener(this);
         mIvPlayingPre.setOnClickListener(this);
+        mIvPlayingMode.setOnClickListener(this);
         mSbPlaySeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -256,6 +264,7 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
 
     /**
      * 更新UI事件的接收
+     *
      * @param info 歌曲信息
      */
     @Subscribe
@@ -264,23 +273,28 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
         String title = info.getTitle();
         String author = info.getAuthor();
         String url = info.getPicUrl();
-        int position = info.getCurPosition();
-        int totalPosition = info.getTotalPosition();
+
         mActionBar.setTitle(title + "---" + author);
-        mSbPlaySeek.setMax(totalPosition);
-        SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-        String total = format.format(totalPosition);
-        String curPosition = format.format(position);
-        mTvMusicDuration.setText(total);
-        mTvMusicDurationPlayed.setText(curPosition);
+
         if (!TextUtils.isEmpty(url)) {
             new PathAsyncTask(mIvAlbumart).execute(url);
         }
-        System.out.println("歌曲索引："+info.getIndex());
+        System.out.println("歌曲索引：" + info.getIndex());
         updateData();
+
         mViewPager.setCurrentItem(info.getIndex());
 
 
+    }
+
+    @Subscribe
+    public void onUpdateViewPagerEvent(UpdateViewPagerBean bean) {
+        int item = mViewPager.getCurrentItem();
+        updateData();
+        if (item == mFragmentList.size()) {
+            return;
+        }
+        mViewPager.setCurrentItem(item + 1);
     }
 
     private void setToolBar() {
@@ -302,10 +316,10 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
             case R.id.iv_playing_next: {
                 int item = mViewPager.getCurrentItem();
                 updateData();
-                if(item==mFragmentList.size()){
+                if (item == mFragmentList.size()) {
                     return;
                 }
-                mViewPager.setCurrentItem(item+1);
+                mViewPager.setCurrentItem(item + 1);
                 break;
             }
             case R.id.iv_playing_play: {
@@ -324,15 +338,48 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
             }
             case R.id.iv_playing_pre: {
                 int item = mViewPager.getCurrentItem();
-                if(item==0){
+                if (item == 0) {
                     return;
                 }
-                mViewPager.setCurrentItem(item-1);
+                mViewPager.setCurrentItem(item - 1);
+            }
+            case R.id.iv_playing_mode: {
+                switch (mConnection.mMediaPlayService.getPlayMode()) {
+                    case AppConstantValue.PLAYING_MODE_REPEAT_ALL: {
+                        //目前是循环列表 变成随机播放
+                        mIvPlayingMode.setImageResource(R.drawable.play_icn_shuffle);
+                        Toast.makeText(PlayingActivity.this.getApplication(), "随机播放",
+                                Toast.LENGTH_SHORT).show();
+                        mConnection.mMediaPlayService.setPlayMode(AppConstantValue.PLAYING_MODE_SHUFFLE_NORMAL);
+
+                        break;
+                    }
+                    case AppConstantValue.PLAYING_MODE_REPEAT_CURRENT: {
+                        //目前是单曲循环 变成循环列表
+                        mIvPlayingMode.setImageResource(R.drawable.play_icn_loop);
+                        Toast.makeText(PlayingActivity.this.getApplication(), "循环列表",
+                                Toast.LENGTH_SHORT).show();
+                        mConnection.mMediaPlayService.setPlayMode(AppConstantValue.PLAYING_MODE_REPEAT_ALL);
+
+
+                        break;
+                    }
+                    case AppConstantValue.PLAYING_MODE_SHUFFLE_NORMAL: {
+                        //目前是随机播放 变成单曲循环
+                        mIvPlayingMode.setImageResource(R.drawable.play_icn_one);
+                        Toast.makeText(PlayingActivity.this.getApplication(), "单曲循环",
+                                Toast.LENGTH_SHORT).show();
+                        mConnection.mMediaPlayService.setPlayMode(AppConstantValue.PLAYING_MODE_REPEAT_CURRENT);
+
+                        break;
+                    }
+
+                }
+
             }
         }
 
     }
-
 
 
     private static class PathAsyncTask extends AsyncTask<String, Void, String> {

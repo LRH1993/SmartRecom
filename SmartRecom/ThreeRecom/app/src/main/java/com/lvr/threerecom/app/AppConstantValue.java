@@ -29,6 +29,11 @@ public class AppConstantValue {
     public static final int SENSOR_STATE_UPSTAIRS =5;
     public static final int SENSOR_STATE_DOWNSTAIRS =6;
     public static final int SENSOR_STATE_RUN =7;
-
+    //列表循环
+    public static final int PLAYING_MODE_REPEAT_ALL = 0;
+    //随机播放
+    public static final int PLAYING_MODE_SHUFFLE_NORMAL = 1;
+    //单曲循环
+    public static final int PLAYING_MODE_REPEAT_CURRENT = 2;
 
 }

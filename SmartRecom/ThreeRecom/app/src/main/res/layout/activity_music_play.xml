@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/play_icn_loop_prs"/>
+                    android:src="@drawable/play_icn_loop"/>
 
                 <ImageView
                     android:id="@+id/iv_playing_pre"
