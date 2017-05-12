@@ -2,6 +2,7 @@ package com.lvr.threerecom.ui.music.model.impl;
 
 import com.lvr.threerecom.api.ApiService;
 import com.lvr.threerecom.app.AppApplication;
+import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
@@ -62,4 +63,12 @@ public class MusicModelImpl implements MusicModel {
         ApiService api = retrofitClient.create(ApiService.class);
         return api.getSongDetail(from,version,format,  method, songid).compose(RetrofitClient.schedulersTransformer);
     }
+
+    @Override
+    public Observable<RankingListDetail> loadRankListDetail(String format, String from, String method, int type, int offset, int size, String fields) {
+        RetrofitClient retrofitClient = RetrofitClient.getInstance(AppApplication.getAppContext(), ApiService.MUSIC_BASE_URL);
+        ApiService api = retrofitClient.create(ApiService.class);
+        return api.getRankingListDetail(format,from,method,type,offset,size,fields).compose(RetrofitClient.schedulersTransformer);
+    }
+
 }

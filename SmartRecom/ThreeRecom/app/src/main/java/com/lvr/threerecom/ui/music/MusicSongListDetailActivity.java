@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 
@@ -122,7 +123,7 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
     //请求返回的SongDetailInfo先存放在数组中，对应下标索引是其在集合中所处位置
     private SongDetailInfo[] mInfos;
     //指示现在加入musicList集合中的元素下标应该是多少
-    private int index = 0;
+    AtomicInteger index = new AtomicInteger(0);
 
     @Override
     public int getLayoutId() {
@@ -228,8 +229,8 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
                 Integer position = positionMap.get(song_id);
                 mInfos[position] = info;
             }
-            index++;
-            if (index == mInfos.length) {
+            int currentNumber = index.addAndGet(1);
+            if (currentNumber == mInfos.length) {
                 for (int i = 0; i < mInfos.length; i++) {
                     if(i==0){
                         //先清除之前的播放集合
@@ -237,9 +238,10 @@ public class MusicSongListDetailActivity extends BaseActivityWithoutStatus imple
                     }
                     mService.addMusicList(mInfos[i]);
                 }
+                LoadingDialog.cancelDialogForLoading();
             }
 
-            LoadingDialog.cancelDialogForLoading();
+
         }
 
 

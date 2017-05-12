@@ -11,12 +11,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.lvr.threerecom.R;
+import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.sensorcollection.listener.SensorListener;
 import com.lvr.threerecom.sensorcollection.observer.SensorObserver;
 import com.lvr.threerecom.sensorcollection.observer.SensorObserverable;
@@ -24,7 +26,6 @@ import com.lvr.threerecom.sensorcollection.utils.Constant;
 import com.lvr.threerecom.sensorcollection.utils.HttpUtil;
 import com.lvr.threerecom.sensorcollection.utils.JSONUtil;
 import com.lvr.threerecom.sensorcollection.utils.SensorUtil;
-import com.lvr.threerecom.app.AppConstantValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,8 @@ public class SensorService extends Service implements SensorObserver {
     private SensorUtil sensorUtil;
     private SensorManager sensorManager;
     private SensorListener listener;
+    private PowerManager pm;
+    private PowerManager.WakeLock wl;
     private int state = AppConstantValue.SENSOR_STATE_ERROR;
     private int[] state_collect = new int[3];
     private int count = 0;
@@ -51,7 +54,7 @@ public class SensorService extends Service implements SensorObserver {
             super.handleMessage(msg);
             String hint = "您当前的状态为：" + mStrings[msg.what + 1];
             System.out.println(hint);
-            Toast.makeText(getApplicationContext(),hint,Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), hint, Toast.LENGTH_LONG).show();
         }
     };
 
@@ -59,12 +62,19 @@ public class SensorService extends Service implements SensorObserver {
     public void onCreate() {
         super.onCreate();
         System.out.println("开启服务");
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        wl.setReferenceCounted(true);
+        wl.acquire();
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         listener = new SensorListener();
         sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), Constant.samplingRate);
         sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), Constant.samplingRate);
         listener.registerAllObservers(new SensorService());
+
+
         showNotification("SmartRecom为你推荐", "正在检测您当前的状态");
     }
 
@@ -91,7 +101,7 @@ public class SensorService extends Service implements SensorObserver {
         HashMap<String, String> data = new HashMap<String, String>();
         String json = jsonUtil.toJSON(sensorData);
         data.put("sensorData", json);
-        uploadData(data);
+//        uploadData(data);
 
     }
 
@@ -148,6 +158,7 @@ public class SensorService extends Service implements SensorObserver {
         System.out.println("服务被杀死了");
         listener.unregisterAllObservers();
         listener.clearDataBuffer();
+        wl.release();
         super.onDestroy();
     }
 

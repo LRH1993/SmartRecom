@@ -1,6 +1,7 @@
 package com.lvr.threerecom.api;
 
 import com.lvr.threerecom.bean.MovieInfo;
+import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
@@ -58,6 +59,17 @@ public interface ApiService {
                                                   @Query("from") String from,
                                                   @Query("method") String method,
                                                   @Query("kflag") int kflag);
+
+    //获取某个榜单中歌曲信息
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<RankingListDetail> getRankingListDetail(@Query("format") String format,
+                                                       @Query("from") String from,
+                                                       @Query("method") String method,
+                                                       @Query("type") int type,
+                                                       @Query("offset") int offset,
+                                                       @Query("size") int size,
+                                                       @Query("fields") String fields);
 
     //获取某个歌单中的信息
     @GET("ting")

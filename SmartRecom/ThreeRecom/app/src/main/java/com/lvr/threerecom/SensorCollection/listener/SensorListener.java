@@ -38,6 +38,7 @@ public class SensorListener extends SensorObserverable implements SensorEventLis
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        System.out.println("onSensorChanged回调");
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 handleAccData(event);

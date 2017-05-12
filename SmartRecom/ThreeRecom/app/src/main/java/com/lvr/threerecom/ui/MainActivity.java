@@ -26,6 +26,7 @@ import com.lvr.threerecom.adapter.MainAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
 import com.lvr.threerecom.app.AppConstantValue;
+import com.lvr.threerecom.app.BaiDuMusicApi;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.ui.home.presenter.impl.MainPresenterImpl;
@@ -73,6 +74,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         initData();
         mPresenter.requestHotMoviee();
         initSensorService();
+
     }
 
     /**

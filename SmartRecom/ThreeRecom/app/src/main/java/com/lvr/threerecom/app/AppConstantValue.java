@@ -17,6 +17,7 @@ public class AppConstantValue {
     public static final String MUSIC_URL_METHOD_RANKINGLIST ="baidu.ting.billboard.billCategory";
     public static final String MUSIC_URL_METHOD_SONGLIST_DETAIL ="baidu.ting.diy.gedanInfo";
     public static final String MUSIC_URL_METHOD_SONG_DETAIL ="baidu.ting.song.play";
+    public static final String MUSIC_URL_METHOD_RANKING_DETAIL ="baidu.ting.billboard.billList";
     public static final  int MUSIC_URL_RANKINGLIST_FLAG = 1;
     public static final String MUSIC_URL_FROM_2 = "android";
     public static final String MUSIC_URL_VERSION = "5.6.5.6";
