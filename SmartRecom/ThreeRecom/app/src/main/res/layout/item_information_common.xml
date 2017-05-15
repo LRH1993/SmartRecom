@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="60dp">
+
+    <TextView
+        android:gravity="center"
+        android:layout_alignParentLeft="true"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="用户名"
+        android:id="@+id/tv_title"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:paddingRight="23dp"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="骑驴找马"
+        android:id="@+id/tv_content"/>
+
+
+</RelativeLayout>

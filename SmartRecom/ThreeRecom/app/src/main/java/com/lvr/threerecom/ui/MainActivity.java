@@ -2,6 +2,7 @@ package com.lvr.threerecom.ui;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -26,9 +28,9 @@ import com.lvr.threerecom.adapter.MainAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
 import com.lvr.threerecom.app.AppConstantValue;
-import com.lvr.threerecom.app.BaiDuMusicApi;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.bean.MovieInfo;
+import com.lvr.threerecom.ui.home.MyInformationActivity;
 import com.lvr.threerecom.ui.home.presenter.impl.MainPresenterImpl;
 import com.lvr.threerecom.ui.home.view.MainView;
 import com.lvr.threerecom.ui.login.LoginActivity;
@@ -55,6 +57,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private MainAdapter mMainAdapter;
     private List<MovieInfo> mList = new ArrayList<>();
     private MainPresenterImpl mPresenter;
+    private boolean isLogin =true;
+    private AlertDialog mDialog;
 
     @Override
     public int getLayoutId() {
@@ -182,6 +186,29 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
             case R.id.mn_music: {
                 MusicActivity.startAction(MainActivity.this);
+                break;
+            }
+            case R.id.mn_information:{
+                if(isLogin){
+                    //已经登录了
+                    Intent intent = new Intent(MainActivity.this, MyInformationActivity.class);
+                    startActivity(intent);
+
+                }else{
+                    //提示还未登录
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("提示");
+                    builder.setMessage("还未登录！\n\n登录后才能完善个人信息！");
+                    builder.setPositiveButton("知道", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mDialog.dismiss();
+                        }
+                    });
+                    mDialog = builder.create();
+                    mDialog.show();
+                }
+
                 break;
             }
 

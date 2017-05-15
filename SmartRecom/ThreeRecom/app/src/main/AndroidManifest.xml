@@ -31,6 +31,7 @@
         <activity android:name=".ui.music.MusicSongListDetailActivity"></activity>
         <activity android:name=".ui.music.PlayingActivity"></activity>
         <activity android:name=".ui.music.MusicRankingListDetailActivity"></activity>
+        <activity android:name=".ui.home.MyInformationActivity"></activity>
 
 
         <service

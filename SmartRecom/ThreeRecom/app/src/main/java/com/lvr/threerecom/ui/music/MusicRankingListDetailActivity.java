@@ -45,7 +45,7 @@ import butterknife.BindView;
  * Created by lvr on 2017/5/12.
  */
 
-public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus implements MusicRankingListDetailView {
+public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus implements MusicRankingListDetailView, MusicRankingListDetailAdapter.onItemClickListener, MusicRankingListDetailAdapter.onPlayAllClickListener {
     @BindView(R.id.iv_album_art)
     ImageView mIvAlbumArt;
     @BindView(R.id.rl_toobar)
@@ -78,7 +78,8 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
     //指示现在加入musicList集合中的元素下标应该是多少
     private AtomicInteger index = new AtomicInteger(0);
     private Intent mIntent;
-
+    private boolean isPlayAll = false;
+    private boolean isLocal;
 
     @Override
     public int getLayoutId() {
@@ -120,12 +121,14 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
 
     private void setRecyclerView() {
         mDetailAdapter = new MusicRankingListDetailAdapter(mContext, mList);
+        mDetailAdapter.setOnItemClickListener(this);
+        mDetailAdapter.setOnPlayAllClickListener(this);
         mIrvSongDetail.setLayoutManager(new LinearLayoutManager(mContext));
         mIrvSongDetail.setItemAnimator(new LandingAnimator());
         mIrvSongDetail.setIAdapter(new ScaleInAnimationAdapter(mDetailAdapter));
         mIrvSongDetail.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         LoadingDialog.showDialogForLoading(this).show();
-        mPresenter.requestRankListDetail(AppConstantValue.MUSIC_URL_FORMAT,AppConstantValue.MUSIC_URL_FROM,AppConstantValue.MUSIC_URL_METHOD_RANKING_DETAIL,mType,0,100,mFields);
+        mPresenter.requestRankListDetail(AppConstantValue.MUSIC_URL_FORMAT, AppConstantValue.MUSIC_URL_FROM, AppConstantValue.MUSIC_URL_METHOD_RANKING_DETAIL, mType, 0, 100, mFields);
     }
 
 
@@ -142,11 +145,12 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
 
     /**
      * 设置UI信息
+     *
      * @param billboard
      */
     private void setUI(RankingListDetail.BillboardBean billboard) {
         mTvName.setText(billboard.getName());
-        ImageLoaderUtils.display(this,mIvAlbumArt,billboard.getPic_s260());
+        ImageLoaderUtils.display(this, mIvAlbumArt, billboard.getPic_s260());
 
     }
 
@@ -162,15 +166,15 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
 
     @Override
     public void returnSongDetail(SongDetailInfo info) {
-        System.out.println("回调次数："+index);
+        System.out.println("回调次数：" + index);
         if (mMediaBinder != null) {
             if (mService == null) {
                 mService = mMediaBinder.getMediaPlayService();
             }
 
-            if(info.getSonginfo()==null){
+            if (info.getSonginfo() == null) {
                 // TODO: 2017/5/10 为空 不能播放 后续需要处理
-            }else{
+            } else {
                 String song_id = info.getSonginfo().getSong_id();
                 Integer position = positionMap.get(song_id);
                 mInfos[position] = info;
@@ -178,7 +182,7 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
             int currentNumber = index.addAndGet(1);
             if (currentNumber == mInfos.length) {
                 for (int i = 0; i < mInfos.length; i++) {
-                    if(i==0){
+                    if (i == 0) {
                         //先清除之前的播放集合
                         mService.clearMusicList();
                     }
@@ -191,6 +195,24 @@ public class MusicRankingListDetailActivity extends BaseActivityWithoutStatus im
         }
     }
 
+    @Override
+    public void onItemClick(int position) {
+        //播放单个
+        isPlayAll = false;
+        if (mService != null) {
+            mService.setPlayAll(false);
+            mService.playSong(position, isLocal);
+        }
+    }
+
+    @Override
+    public void onItemClick() {
+        //播放全部
+        isPlayAll = true;
+        if (mService != null) {
+            mService.playAll(isLocal);
+        }
+    }
 
 
     private static class MediaServiceConnection implements ServiceConnection {

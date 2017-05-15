@@ -32,7 +32,7 @@ import com.lvr.threerecom.R;
 import com.lvr.threerecom.adapter.MusicPlayingViewPagerAdapter;
 import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.app.AppConstantValue;
-import com.lvr.threerecom.base.BaseActivity;
+import com.lvr.threerecom.base.BaseActivityWithoutStatus;
 import com.lvr.threerecom.base.BaseFragment;
 import com.lvr.threerecom.bean.SongUpdateInfo;
 import com.lvr.threerecom.bean.UpdateViewPagerBean;
@@ -40,6 +40,7 @@ import com.lvr.threerecom.broadcastreceiver.ProgressReceiver;
 import com.lvr.threerecom.service.MediaPlayService;
 import com.lvr.threerecom.service.MediaServiceConnection;
 import com.lvr.threerecom.ui.music.fragment.RoundFragment;
+import com.lvr.threerecom.utils.StatusBarSetting;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,7 +58,7 @@ import de.greenrobot.event.Subscribe;
  * Created by lvr on 2017/5/2.
  */
 
-public class PlayingActivity extends BaseActivity implements View.OnClickListener {
+public class PlayingActivity extends BaseActivityWithoutStatus implements View.OnClickListener {
     @BindView(R.id.iv_albumart)
     ImageView mIvAlbumart;
     @BindView(R.id.toolbar)
@@ -142,6 +143,7 @@ public class PlayingActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public void initView() {
+        StatusBarSetting.transparentStatusBar(this);
         mContext = this;
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();

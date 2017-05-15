@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -41,8 +40,6 @@ public class SensorService extends Service implements SensorObserver {
     private SensorUtil sensorUtil;
     private SensorManager sensorManager;
     private SensorListener listener;
-    private PowerManager pm;
-    private PowerManager.WakeLock wl;
     private int state = AppConstantValue.SENSOR_STATE_ERROR;
     private int[] state_collect = new int[3];
     private int count = 0;
@@ -62,10 +59,7 @@ public class SensorService extends Service implements SensorObserver {
     public void onCreate() {
         super.onCreate();
         System.out.println("开启服务");
-        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
-        wl.setReferenceCounted(true);
-        wl.acquire();
+
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -158,7 +152,6 @@ public class SensorService extends Service implements SensorObserver {
         System.out.println("服务被杀死了");
         listener.unregisterAllObservers();
         listener.clearDataBuffer();
-        wl.release();
         super.onDestroy();
     }
 
