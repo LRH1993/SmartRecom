@@ -17,6 +17,9 @@
         android:id="@+id/tv_title"/>
 
     <TextView
+        android:maxLength="8"
+        android:singleLine="true"
+        android:ellipsize="end"
         android:gravity="center"
         android:layout_alignParentRight="true"
         android:paddingRight="23dp"

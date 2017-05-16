@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lvr.threerecom.widget.SuperTextView
+    android:gravity="center"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stv_title"
+    android:textColor="@color/colorPrimary"
+    android:layout_margin="10dp"
+    android:padding="10dp"
+    app:stroke_color="@color/colorPrimary"
+    app:stroke_width="2dp"
+    android:text="我不是内容，你好吗"
+    android:textSize="14sp"
+    app:corner="5dp"
+    app:left_top_corner="true"
+    app:right_top_corner="true"
+    app:left_bottom_corner="true"
+    app:right_bottom_corner="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+</com.lvr.threerecom.widget.SuperTextView>

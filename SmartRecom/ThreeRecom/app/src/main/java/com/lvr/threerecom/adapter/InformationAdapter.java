@@ -77,6 +77,7 @@ public class InformationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((CommonViewHolder) holder).mTitle.setText(bean.getTitle());
             if(bean.isSet()){
                 ((CommonViewHolder) holder).mContent.setText(bean.getContent());
+                ((CommonViewHolder) holder).mContent.setTextColor(context.getResources().getColor(R.color.text_color));
             }else{
                 ((CommonViewHolder) holder).mContent.setText("未设置");
                 ((CommonViewHolder) holder).mContent.setTextColor(context.getResources().getColor(R.color.time_line));
@@ -84,7 +85,7 @@ public class InformationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((CommonViewHolder) holder).mContent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    mOnItemClickListenr.onItemClick(position);
                 }
             });
         }

@@ -32,6 +32,8 @@
         <activity android:name=".ui.music.PlayingActivity"></activity>
         <activity android:name=".ui.music.MusicRankingListDetailActivity"></activity>
         <activity android:name=".ui.home.MyInformationActivity"></activity>
+        <activity android:name=".ui.home.FavorMovieActivity"></activity>
+        <activity android:name=".ui.home.FavorMusicActivity"></activity>
 
 
         <service

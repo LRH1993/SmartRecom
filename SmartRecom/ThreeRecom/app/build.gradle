@@ -58,5 +58,7 @@ dependencies {
     compile files('libs/fastjson-1.2.2-sources.jar')
     compile files('libs/fastjson-1.2.2.jar')
     compile files('libs/log4j-1.2.17.jar')
-    compile 'com.android.support:percent:23.3.0'
+    compile 'com.android.support:percent:25.1.0'
+    compile 'com.google.android:flexbox:0.3.0-alpha2'
+
 }
