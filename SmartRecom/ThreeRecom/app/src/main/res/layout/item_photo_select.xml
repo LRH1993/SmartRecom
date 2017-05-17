@@ -7,6 +7,7 @@
               android:orientation="vertical">
 
     <TextView
+        android:background="?attr/selectableItemBackground"
         android:id="@+id/tv_take_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,6 +22,7 @@
         android:background="@color/listSubTextColor">
     </View>
     <TextView
+        android:background="?attr/selectableItemBackground"
         android:id="@+id/tv_select_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:windowBackground">@color/background_material_light_1</item>
         <item name="android:windowAnimationStyle">@style/AnimationActivity</item>
+        <!-- ActionBar上Menu的字体颜色 -->
+        <item name="actionMenuTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
