@@ -132,8 +132,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         mBtnLogin.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.AppTheme_Dark_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("正在验证...");
         progressDialog.show();

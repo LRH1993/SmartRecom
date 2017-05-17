@@ -125,8 +125,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
         mBtnSignup.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this,
-                R.style.AppTheme_Dark_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("正在创建账户...");
         progressDialog.show();

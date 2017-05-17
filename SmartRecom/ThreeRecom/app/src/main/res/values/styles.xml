@@ -45,12 +45,7 @@
         <item name="android:colorButtonNormal">@color/colorPrimary</item>
     </style>
 
-    <!--登录提示Dialog-->
-    <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
-        <item name="colorAccent">@color/white</item>
-        <item name="android:textColorPrimary">@color/gray</item>
-        <item name="android:background">@color/colorPrimary</item>
-    </style>
+
     <!--Activity动画-->
     <style name="AnimationActivity" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/slide_in_left</item>

@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".app.AppApplication"
@@ -36,6 +35,8 @@
         <activity android:name=".ui.home.FavorMusicActivity"></activity>
         <activity android:name=".ui.home.AboutActivity"></activity>
         <activity android:name=".ui.home.OpenSourceActivity"></activity>
+        <activity android:name=".ui.home.ContactAuthorActivity"></activity>
+        <activity android:name=".ui.home.IntroductionActivity"></activity>
 
 
         <service

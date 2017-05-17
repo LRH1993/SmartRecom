@@ -13,16 +13,15 @@ import butterknife.BindView;
  * Created by lvr on 2017/5/17.
  */
 
-public class OpenSourceActivity extends BaseActivity {
+public class IntroductionActivity extends BaseActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.web_view)
     WebView mWebView;
 
-
     @Override
     public int getLayoutId() {
-        return R.layout.activity_open_source;
+        return R.layout.activity_introduction;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class OpenSourceActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        mToolbar.setTitle("开源许可");
+        mToolbar.setTitle("功能介绍");
         mToolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(mToolbar);
         mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -42,9 +41,8 @@ public class OpenSourceActivity extends BaseActivity {
                 finish();
             }
         });
-        mWebView.loadUrl("file:///android_asset/license.html");
+        mWebView.loadUrl("file:///android_asset/introduction.html");
     }
-
 
 
 }
