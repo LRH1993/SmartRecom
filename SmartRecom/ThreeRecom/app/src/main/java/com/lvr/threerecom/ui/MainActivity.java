@@ -30,6 +30,7 @@ import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
 import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.bean.MovieInfo;
+import com.lvr.threerecom.ui.home.AboutActivity;
 import com.lvr.threerecom.ui.home.MyInformationActivity;
 import com.lvr.threerecom.ui.home.presenter.impl.MainPresenterImpl;
 import com.lvr.threerecom.ui.home.view.MainView;
@@ -136,6 +137,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void setHomeItemState() {
         Menu menu = mNavigation.getMenu();
         MenuItem item = menu.getItem(0);
+        //更多中  特殊情况  取消选中状态
+        menu.getItem(5).getSubMenu().getItem(0).setChecked(false);
+        menu.getItem(5).getSubMenu().getItem(1).setChecked(false);
+        menu.getItem(5).getSubMenu().getItem(2).setChecked(false);
         item.setChecked(true);
     }
 
@@ -209,6 +214,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     mDialog.show();
                 }
 
+                break;
+            }
+            case R.id.mn_about:{
+                //跳转到关于页面
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
                 break;
             }
 

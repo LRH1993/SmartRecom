@@ -34,6 +34,8 @@
         <activity android:name=".ui.home.MyInformationActivity"></activity>
         <activity android:name=".ui.home.FavorMovieActivity"></activity>
         <activity android:name=".ui.home.FavorMusicActivity"></activity>
+        <activity android:name=".ui.home.AboutActivity"></activity>
+        <activity android:name=".ui.home.OpenSourceActivity"></activity>
 
 
         <service

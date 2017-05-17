@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.google.android.flexbox.AlignItems;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayoutManager;
@@ -76,7 +75,7 @@ public class FavorMusicActivity extends BaseActivityWithoutStatus implements Vie
         manager.setFlexDirection(FlexDirection.ROW);
         //设置是否换行
         manager.setFlexWrap(FlexWrap.WRAP);
-        manager.setAlignItems(AlignItems.STRETCH);
+
         mRvFavor.setLayoutManager(manager);
         mRvFavor.setItemAnimator(new DefaultItemAnimator());
         mRvFavor.setAdapter(mAdapter);

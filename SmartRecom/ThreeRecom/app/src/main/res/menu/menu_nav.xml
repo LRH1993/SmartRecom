@@ -10,7 +10,7 @@
 
 
     </group>
-    <item android:title="更多">
+    <item android:title="更多" android:id="@+id/mn_more">
         <menu>
             <item
                 android:id="@+id/mn_change"
