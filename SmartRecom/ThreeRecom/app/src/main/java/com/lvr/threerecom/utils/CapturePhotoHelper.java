@@ -69,7 +69,7 @@ public class CapturePhotoHelper {
     /**
      * 创建照片文件
      */
-    private void createPhotoFile() {
+    public void createPhotoFile() {
         if (mPhotoFolder != null) {
             if (!mPhotoFolder.exists()) {//检查保存图片的目录存不存在
                 mPhotoFolder.mkdirs();

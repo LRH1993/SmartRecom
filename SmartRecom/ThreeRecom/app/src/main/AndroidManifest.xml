@@ -37,7 +37,6 @@
         <activity android:name=".ui.home.OpenSourceActivity"></activity>
         <activity android:name=".ui.home.ContactAuthorActivity"></activity>
         <activity android:name=".ui.home.IntroductionActivity"></activity>
-        <activity android:name=".ui.home.PhotoPreviewActivity"></activity>
 
 
         <service

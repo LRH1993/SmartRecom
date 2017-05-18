@@ -38,7 +38,6 @@ public class SensorListener extends SensorObserverable implements SensorEventLis
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        System.out.println("onSensorChanged回调");
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 handleAccData(event);
@@ -67,11 +66,11 @@ public class SensorListener extends SensorObserverable implements SensorEventLis
             sensorData.add(accData);
             if (checkData()) {
                 //一个时间窗的数据采集完成
-                System.out.println("一个时间窗的数据采集完成");
+//                System.out.println("一个时间窗的数据采集完成");
                 //为减少误差采集数据是前面的数据应该丢弃
                 if (index == Constant.delayTime) {
                     isTrans = true;
-                    System.out.println("为减小误差延时结束，正式开始采集数据");
+//                    System.out.println("为减小误差延时结束，正式开始采集数据");
                 }
                 if (isTrans) {
                     //进入了发送模式
@@ -105,10 +104,10 @@ public class SensorListener extends SensorObserverable implements SensorEventLis
             sensorData.add(gyroData);
             gyroRecorded = true;
             if (checkData()) {
-                System.out.println("一个时间窗的数据采集完成");
+//                System.out.println("一个时间窗的数据采集完成");
                 if (index == Constant.delayTime) {
                     isTrans = true;
-                    System.out.println("为减小误差延时结束，正式开始采集数据");
+//                    System.out.println("为减小误差延时结束，正式开始采集数据");
                 }
                 if (isTrans) {
                     //进入了发送模式

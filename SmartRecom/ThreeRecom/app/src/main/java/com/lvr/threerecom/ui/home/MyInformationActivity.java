@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +38,7 @@ import com.lvr.threerecom.bean.FavorListBean;
 import com.lvr.threerecom.bean.InformationBean;
 import com.lvr.threerecom.ui.home.presenter.impl.InformationPresenterImpl;
 import com.lvr.threerecom.ui.home.view.InformationView;
+import com.lvr.threerecom.utils.BitmapUtils;
 import com.lvr.threerecom.utils.CapturePhotoHelper;
 import com.lvr.threerecom.utils.FolderManager;
 
@@ -50,8 +54,10 @@ import de.greenrobot.event.Subscribe;
  * Created by lvr on 2017/5/15.
  */
 
-public class MyInformationActivity extends BaseActivity implements InformationView,InformationAdapter.onItemClickListenr {
-
+public class MyInformationActivity extends BaseActivity implements InformationView, InformationAdapter.onItemClickListenr {
+    //请求开启相册
+    private static final int REQUEST_PICK_IMAGE = 3;
+    private static final int REQUEST_PICKER_AND_CROP_2 = 4;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.irv_information)
@@ -65,6 +71,9 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
     private Context mContext;
     private final static String TAG = MyInformationActivity.class.getSimpleName();
     private final static String EXTRA_RESTORE_PHOTO = "extra_restore_photo";
+
+    //选取图片并裁剪
+    private final static int REQUEST_PICKER_AND_CROP = 2;
     /**
      * 运行时权限申请码
      */
@@ -72,6 +81,8 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
 
     private CapturePhotoHelper mCapturePhotoHelper;
     private File mRestorePhotoFile;
+    private File tempFile = new File(Environment.getExternalStorageDirectory(), "temp_photo.jpg");
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_my_information;
@@ -98,7 +109,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
         mBar.setTitle("完善个人信息");
         setRecycleView();
         mPresenter.requestInformation();
-        if(!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
@@ -109,14 +120,19 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
      */
     private void saveInforamtion() {
 
+
+        if(tempFile.exists()){
+            tempFile.delete();
+        }
+
     }
 
     private void setRecycleView() {
-        mAdapter = new InformationAdapter(mContext,mList);
+        mAdapter = new InformationAdapter(mContext, mList);
         mAdapter.setOnItemClickListenr(this);
         mIrvInformation.setLayoutManager(new LinearLayoutManager(mContext));
         mIrvInformation.setItemAnimator(new DefaultItemAnimator());
-        mIrvInformation.addItemDecoration(new DividerItemDecoration(mContext,DividerItemDecoration.VERTICAL));
+        mIrvInformation.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         mIrvInformation.setIAdapter(mAdapter);
     }
 
@@ -135,29 +151,29 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
      */
     @Subscribe
     public void onFavorListEvent(FavorListBean info) {
-        if(info.isMovie()){
+        if (info.isMovie()) {
             List<String> list = info.getList();
             InformationBean bean = mList.get(4);
             StringBuffer buffer = new StringBuffer();
-            for(int i=0;i<list.size();i++){
-                if(i==list.size()-1){
+            for (int i = 0; i < list.size(); i++) {
+                if (i == list.size() - 1) {
                     buffer.append(list.get(i));
-                }else {
-                    buffer.append(list.get(i)+"、");
+                } else {
+                    buffer.append(list.get(i) + "、");
                 }
             }
             bean.setSet(true);
             bean.setContent(buffer.toString());
             mAdapter.notifyItemChanged(4);
-        }else{
+        } else {
             List<String> list = info.getList();
             InformationBean bean = mList.get(5);
             StringBuffer buffer = new StringBuffer();
-            for(int i=0;i<list.size();i++){
-                if(i==list.size()-1){
+            for (int i = 0; i < list.size(); i++) {
+                if (i == list.size() - 1) {
                     buffer.append(list.get(i));
-                }else {
-                    buffer.append(list.get(i)+"、");
+                } else {
+                    buffer.append(list.get(i) + "、");
                 }
             }
             bean.setSet(true);
@@ -169,13 +185,14 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
 
     @Override
     public void onItemClick(int position) {
-        if(position==0){
+        if (position == 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("选择图片");
             LayoutInflater inflater = getLayoutInflater();
             View view = inflater.inflate(R.layout.item_photo_select, (ViewGroup) findViewById(R.id.ll_root), false);
             TextView mTv_take_photo = (TextView) view.findViewById(R.id.tv_take_photo);
-            builder.setView(view,100,30,100,30);
+            TextView mTv_select_photo = (TextView) view.findViewById(R.id.tv_select_photo);
+            builder.setView(view, 100, 30, 100, 30);
             final AlertDialog dialog = builder.create();
             mTv_take_photo.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -194,15 +211,37 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                     } else {
                         turnOnCamera();
                     }
-                    if(dialog!=null){
+                    if (dialog != null) {
                         dialog.dismiss();
                     }
 
                 }
             });
+            mTv_select_photo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { //Android M 处理Runtime Permission
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {//检查是否有写入SD卡的授权
+                            Log.i(TAG, "granted permission!");
+                            turnOnAlbum();
+                        } else {
+                            Log.i(TAG, "denied permission!");
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(MyInformationActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                                Log.i(TAG, "should show request permission rationale!");
+                            }
+                            requestPermission();
+                        }
+                    } else {
+                        turnOnAlbum();
+                    }
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                }
+            });
             dialog.show();
         }
-        if(position==1){
+        if (position == 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("修改用户名");
             LayoutInflater inflater = getLayoutInflater();
@@ -210,7 +249,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             final EditText editText = (EditText) view.findViewById(R.id.ed_content);
             editText.setText(mList.get(1).getContent());
             editText.setSelection(editText.getText().length());
-            builder.setView(view,100,30,100,30);
+            builder.setView(view, 100, 30, 100, 30);
             final AlertDialog dialog = builder.create();
             Button bt_positive = (Button) view.findViewById(R.id.bt_positive);
             Button bt_negative = (Button) view.findViewById(R.id.bt_negative);
@@ -218,7 +257,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                 @Override
                 public void onClick(View v) {
                     InformationBean bean = mList.get(1);
-                    if(!editText.getText().toString().isEmpty()&&!editText.getText().toString().equals("未设置")){
+                    if (!editText.getText().toString().isEmpty() && !editText.getText().toString().equals("未设置")) {
                         bean.setSet(true);
                         bean.setContent(editText.getText().toString());
                         mAdapter.notifyItemChanged(1);
@@ -234,7 +273,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             });
             dialog.show();
         }
-        if(position==2){
+        if (position == 2) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("修改年龄");
             LayoutInflater inflater = getLayoutInflater();
@@ -242,7 +281,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             final EditText editText = (EditText) view.findViewById(R.id.ed_content);
             editText.setText(mList.get(2).getContent());
             editText.setSelection(editText.getText().length());
-            builder.setView(view,100,30,100,30);
+            builder.setView(view, 100, 30, 100, 30);
             final AlertDialog dialog = builder.create();
             Button bt_positive = (Button) view.findViewById(R.id.bt_positive);
             Button bt_negative = (Button) view.findViewById(R.id.bt_negative);
@@ -250,7 +289,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                 @Override
                 public void onClick(View v) {
                     InformationBean bean = mList.get(2);
-                    if(!editText.getText().toString().isEmpty()&&!editText.getText().toString().equals("未设置")){
+                    if (!editText.getText().toString().isEmpty() && !editText.getText().toString().equals("未设置")) {
                         bean.setSet(true);
                         bean.setContent(editText.getText().toString());
                         mAdapter.notifyItemChanged(2);
@@ -266,19 +305,19 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             });
             dialog.show();
         }
-        if(position==3){
+        if (position == 3) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("修改性别");
             LayoutInflater inflater = getLayoutInflater();
             View view = inflater.inflate(R.layout.item_gender_select, (ViewGroup) findViewById(R.id.rg_root), false);
             final RadioButton rb_male = (RadioButton) view.findViewById(R.id.rb_male);
             final RadioButton rb_female = (RadioButton) view.findViewById(R.id.rb_female);
-            if(mList.get(3).getContent().equals("男")){
+            if (mList.get(3).getContent().equals("男")) {
                 rb_male.setChecked(true);
-            }else if(mList.get(3).getContent().equals("女")){
+            } else if (mList.get(3).getContent().equals("女")) {
                 rb_female.setChecked(true);
             }
-            builder.setView(view,100,30,100,30);
+            builder.setView(view, 100, 30, 100, 30);
             final AlertDialog dialog = builder.create();
             Button bt_positive = (Button) view.findViewById(R.id.bt_positive);
             Button bt_negative = (Button) view.findViewById(R.id.bt_negative);
@@ -286,11 +325,11 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                 @Override
                 public void onClick(View v) {
                     InformationBean bean = mList.get(3);
-                    if(rb_female.isChecked()){
+                    if (rb_female.isChecked()) {
                         bean.setContent("女");
                         bean.setSet(true);
                     }
-                    if(rb_male.isChecked()){
+                    if (rb_male.isChecked()) {
                         bean.setContent("男");
                         bean.setSet(true);
                     }
@@ -306,12 +345,12 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             });
             dialog.show();
         }
-        if(position==4){
-            if(mList.get(4).isSet()){
+        if (position == 4) {
+            if (mList.get(4).isSet()) {
                 String content = mList.get(4).getContent();
                 String[] movie = content.split("、");
                 favorMovie.clear();
-                for(int i=0;i<movie.length;i++){
+                for (int i = 0; i < movie.length; i++) {
                     favorMovie.add(movie[i]);
                 }
             }
@@ -319,12 +358,12 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             intent.putStringArrayListExtra("select", (ArrayList<String>) favorMovie);
             startActivity(intent);
         }
-        if(position==5){
-            if(mList.get(5).isSet()){
+        if (position == 5) {
+            if (mList.get(5).isSet()) {
                 String content = mList.get(5).getContent();
                 String[] music = content.split("、");
                 favorMusic.clear();
-                for(int i=0;i<music.length;i++){
+                for (int i = 0; i < music.length; i++) {
                     favorMusic.add(music[i]);
                 }
             }
@@ -333,6 +372,16 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             startActivity(intent);
         }
     }
+
+    /**
+     * 开启相册
+     */
+    private void turnOnAlbum() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_PICK_IMAGE);
+
+    }
+
     /**
      * 开启相机
      */
@@ -342,6 +391,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
         }
         mCapturePhotoHelper.capture();
     }
+
     /**
      * 申请写入sd卡的权限
      */
@@ -391,7 +441,9 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                 }
             }
         }
-    } /**
+    }
+
+    /**
      * 显示打开权限提示的对话框
      */
     private void showMissingPermissionDialog() {
@@ -402,7 +454,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MyInformationActivity.this,"启动相机失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyInformationActivity.this, "启动相机失败", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -416,6 +468,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
 
         builder.show();
     }
+
     /**
      * 启动系统权限设置界面
      */
@@ -425,23 +478,72 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
         startActivity(intent);
     }
 
-    //拍照完成后 获取目标文件
+    //拍照完成后 获取目标文件 跳转到裁剪页面
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CapturePhotoHelper.CAPTURE_PHOTO_REQUEST_CODE) {
+            //获取拍照后图片路径
             File photoFile = mCapturePhotoHelper.getPhoto();
+
             if (photoFile != null) {
                 if (resultCode == RESULT_OK) {
-                    Intent previewIntent = new Intent(mContext, PhotoPreviewActivity.class);
-                    previewIntent.putExtra("extra_photo", photoFile);
-                    startActivity(previewIntent);
-                    finish();
+                    Uri uri = Uri.fromFile(photoFile);
+                    Intent intent = new Intent("com.android.camera.action.CROP");
+                    intent.setDataAndType(uri, "image/*");
+                    intent.putExtra("aspectX", 1);
+                    intent.putExtra("aspectY", 1);
+                    intent.putExtra("outputX", 300);
+                    intent.putExtra("outputY", 300);
+                    intent.putExtra("scale", true);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    intent.putExtra("return-data", false);
+                    intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+                    intent.putExtra("noFaceDetection", true); // no face detection
+                    intent = Intent.createChooser(intent, "裁剪图片");
+                    startActivityForResult(intent, REQUEST_PICKER_AND_CROP);
                 } else {
                     if (photoFile.exists()) {
                         photoFile.delete();
                     }
                 }
             }
+
+        } else if (requestCode == REQUEST_PICKER_AND_CROP) {
+            File photoFile = mCapturePhotoHelper.getPhoto();
+            //存放到相册
+            BitmapUtils.displayToGallery(this, photoFile);
+            //更新UI 显示图像
+            InformationBean informationBean = mList.get(0);
+            informationBean.setContent(photoFile.getAbsoluteFile().toString());
+            informationBean.setSet(true);
+            mAdapter.notifyItemChanged(0);
+
+        } else if (requestCode == REQUEST_PICK_IMAGE) {
+            //获取选择图片后图片路径
+
+            if (resultCode == RESULT_OK) {
+                Uri uri =  data.getData();
+                Intent intent = new Intent("com.android.camera.action.CROP");
+                intent.setDataAndType(uri, "image/*");
+                intent.putExtra("aspectX", 1);
+                intent.putExtra("aspectY", 1);
+                intent.putExtra("outputX", 200);
+                intent.putExtra("outputY", 200);
+                intent.putExtra("scale", true);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+                intent.putExtra("return-data", false);
+                intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+                intent.putExtra("noFaceDetection", true); // no face detection
+                intent = Intent.createChooser(intent, "裁剪图片");
+                startActivityForResult(intent, REQUEST_PICKER_AND_CROP_2);
+            }
+        } else if (requestCode == REQUEST_PICKER_AND_CROP_2) {
+
+            //更新UI 显示图像
+            InformationBean informationBean = mList.get(0);
+            informationBean.setContent(tempFile.getAbsoluteFile().toString());
+            informationBean.setSet(true);
+            mAdapter.notifyItemChanged(0);
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);
