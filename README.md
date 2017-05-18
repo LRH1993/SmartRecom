@@ -1,7 +1,7 @@
 # SmartRecom #
 ## 屏幕截图 ##
  <img src="http://i1.piimg.com/588926/275e80a31f695416.jpg" width = "250" height = "450"  align=center /> <img src="http://i4.buimg.com/588926/d4665ffa2a6b2bef.jpg" width = "250" height = "450"  align=center /> <img src="http://i2.muimg.com/588926/f2a856ba1a246c92.jpg" width = "250" height = "450"  align=center />  
-<img src="http://i4.buimg.com/588926/0c120f7b11c40435.jpg" width = "250" height = "450"  align=center /> <img src="http://i1.piimg.com/588926/4aa58be09bc11200.jpg" width = "250" height = "450"  align=center /> <img src="http://i1.piimg.com/588926/26dc66c024927324.jpg" width = "250" height = "450"  align=center />   
+<img src="http://i4.buimg.com/588926/0c120f7b11c40435.jpg" width = "250" height = "450"  align=center /> <img src="http://i1.piimg.com/588926/4aa58be09bc11200.jpg" width = "250" height = "450"  align=center /> <img src="http://i2.muimg.com/588926/9a0bbd2090e00648.jpg" width = "250" height = "450"  align=center />   
 <img src="http://i4.buimg.com/588926/c96533ee34455c0b.jpg" width = "250" height = "450"  align=center /> <img src="http://i4.buimg.com/588926/957f326456e6644a.jpg" width = "250" height = "450"  align=center /> <img src="http://i4.buimg.com/588926/35b5de5e476485bf.jpg" width = "250" height = "450"  align=center />   
 <img src="http://i1.piimg.com/588926/eda709da013e4805.jpg" width = "250" height = "450"  align=center /> <img src="http://i4.buimg.com/588926/0b3a92945252a8d3.jpg" width = "250" height = "450"  align=center /> <img src="http://i4.buimg.com/588926/720e8bec1a483370.jpg" width = "250" height = "450"  align=center />  
 <img src="http://i4.buimg.com/588926/df9d2355d4923b3a.jpg" width = "250" height = "450"  align=center /> <img src="http://i1.piimg.com/588926/ed9d5d4ad8cae5f9.jpg" width = "250" height = "450"  align=center /> <img src="http://i2.muimg.com/588926/29b1d27652294bfe.jpg" width = "250" height = "450"  align=center />   
@@ -60,7 +60,8 @@
 
 ## 2.电影播放器 ##
 为你提供各种在线播放的好看电影。目前电影都是欧美电影，年代较为久远，后期考虑替换，电影播放是跳转到web页面，后期会改进，通过第三方应用进行播放。  
-<img src="http://i1.piimg.com/588926/b1d861cb94cf0662.jpg" width = "250" height = "450"  align=center />
+<img src="http://i1.piimg.com/588926/b1d861cb94cf0662.jpg" width = "250" height = "450" />
+
 
 ## 3.个性化推荐 ##
 先使用行为识别监听当前状态，目前可以监听2种状态：跑步，躺下。 
