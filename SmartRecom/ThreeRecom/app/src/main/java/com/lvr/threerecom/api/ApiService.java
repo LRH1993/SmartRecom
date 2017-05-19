@@ -1,5 +1,6 @@
 package com.lvr.threerecom.api;
 
+import com.lvr.threerecom.bean.LogInAndSignUpBean;
 import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
@@ -11,11 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
-import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -37,10 +35,6 @@ public interface ApiService {
     @GET("getHotMovies.action")
     Observable<Map<String, List<MovieInfo>>> getHotMoive();
 
-
-    @FormUrlEncoded
-    @POST("user/edit")
-    Observable<Map<String, String>> updateLogin(@Field("usernumber") int phoneNumber, @Field("password") String password);
 
 
     //获取全部歌单
@@ -87,5 +81,12 @@ public interface ApiService {
                                              @Query("format") String format,
                                              @Query("method") String method,
                                              @Query("songid") String songid);
-
+    //注册请求 暂时为GET方法 后期转换为POST方法 还有加密
+    @GET("register.action")
+    Observable<LogInAndSignUpBean> getSignUpResult(
+            @Query("username") String username, @Query("password") String password);
+    //登录请求 暂时为GET方法 后期转换为POST方法 还有加密
+    @GET("loginValidation.action")
+    Observable<LogInAndSignUpBean> getLogInResult(
+            @Query("username") String username, @Query("password") String password);
 }

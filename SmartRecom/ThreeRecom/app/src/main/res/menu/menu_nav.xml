@@ -13,10 +13,6 @@
     <item android:title="更多" android:id="@+id/mn_more">
         <menu>
             <item
-                android:id="@+id/mn_change"
-                android:icon="@drawable/change"
-                android:title="主题切换"/>
-            <item
                 android:id="@+id/mn_about"
                 android:icon="@drawable/about"
                 android:title="关于"/>

@@ -41,4 +41,5 @@
             <enum name="rightBottom" value="9"/>
         </attr>
     </declare-styleable>
+
 </resources>

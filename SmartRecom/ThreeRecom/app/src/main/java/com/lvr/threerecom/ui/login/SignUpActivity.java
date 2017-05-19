@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.base.BaseActivity;
+import com.lvr.threerecom.ui.login.presenter.impl.SignUpPresenterImpl;
+import com.lvr.threerecom.ui.login.view.SignUpView;
 import com.lvr.threerecom.utils.StatusBarSetting;
 
 import butterknife.BindView;
@@ -30,7 +32,7 @@ import butterknife.BindView;
  * Created by lvr on 2017/4/23.
  */
 
-public class SignUpActivity extends BaseActivity implements View.OnClickListener{
+public class SignUpActivity extends BaseActivity implements View.OnClickListener,SignUpView{
     private static final String TAG = "SignUpActivity";
     @BindView(R.id.input_email)
     EditText mInputEmail;
@@ -44,6 +46,8 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     ScrollView mSvRoot;
     private Context mContext;
     private int radius = 25;
+    private SignUpPresenterImpl mPresenter;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public int getLayoutId() {
@@ -52,7 +56,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void initPresenter() {
-
+        mPresenter = new SignUpPresenterImpl(this);
     }
 
     @Override
@@ -125,26 +129,14 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
         mBtnSignup.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("正在创建账户...");
-        progressDialog.show();
+        mProgressDialog = new ProgressDialog(SignUpActivity.this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage("正在创建账户...");
+        mProgressDialog.show();
 
-        String email = mInputEmail.getText().toString();
+        String userword = mInputEmail.getText().toString();
         String password = mInputPassword.getText().toString();
-
-        // TODO: 执行登录逻辑
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                        // onSignupFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
+        mPresenter.requestSignUp(userword,password);
     }
 
     /**
@@ -187,5 +179,18 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
         }
 
         return valid;
+    }
+
+    @Override
+    public void returnSignUpResult(boolean result) {
+        if(result){
+            mProgressDialog.dismiss();
+            onSignupSuccess();
+        }else{
+            mProgressDialog.dismiss();
+            Toast.makeText(getBaseContext(), "注册失败，用户名已存在", Toast.LENGTH_SHORT).show();
+
+            mBtnSignup.setEnabled(true);
+        }
     }
 }

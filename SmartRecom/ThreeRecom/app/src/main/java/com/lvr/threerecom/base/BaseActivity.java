@@ -50,8 +50,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         // 设置竖屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
     }
+
 
     /*********************
      * 子类实现

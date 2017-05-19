@@ -26,4 +26,9 @@
     <color name="role_right_gray">#CCD1D9</color>
     <color name="role_yellow_gray">#48CFAD</color>
     <color name="container_background">#EBEBEB</color>
+
+    <color name="color3A3A3A">#3A3A3A</color>
+    <color name="color3F3F3F">#3F3F3F</color>
+    <color name="color8A9599">#8A9599</color>
+    <color name="color868686">#868686</color>
 </resources>

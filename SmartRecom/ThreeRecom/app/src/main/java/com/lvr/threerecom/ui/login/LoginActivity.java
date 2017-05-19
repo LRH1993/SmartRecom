@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.base.BaseActivity;
+import com.lvr.threerecom.ui.login.presenter.impl.LogInPresenterImpl;
+import com.lvr.threerecom.ui.login.view.LogInView;
 import com.lvr.threerecom.utils.StatusBarSetting;
 
 import butterknife.BindView;
@@ -31,7 +33,7 @@ import butterknife.BindView;
  * Created by lvr on 2017/4/23.
  */
 
-public class LoginActivity extends BaseActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener,LogInView {
     private static final String TAG = "LoginActivity";
 
     @BindView(R.id.input_email)
@@ -46,6 +48,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     TextView mTvSignup;
     private Context mContext;
     private int radius = 25;
+    private LogInPresenterImpl mPresenter;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public int getLayoutId() {
@@ -54,7 +58,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     public void initPresenter() {
-
+        mPresenter = new LogInPresenterImpl(this);
     }
 
     @Override
@@ -132,25 +136,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         mBtnLogin.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("正在验证...");
-        progressDialog.show();
+        mProgressDialog = new ProgressDialog(LoginActivity.this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage("正在验证...");
+        mProgressDialog.show();
 
-        String email = mInputEmail.getText().toString();
+        String userword = mInputEmail.getText().toString();
         String password = mInputPassword.getText().toString();
 
-        // TODO: 执行网络验证登录逻辑
+        mPresenter.requestLogIn(userword,password);
 
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
     }
 
     /**
@@ -201,9 +196,21 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == AppConstantValue.REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-                // TODO: 执行注册成功的逻辑
                 this.finish();
+                // TODO: 2017/5/19 执行更新UI的操作
             }
+        }
+    }
+
+    @Override
+    public void returnLogInResult(boolean result) {
+        if(result){
+            mProgressDialog.dismiss();
+            onLoginSuccess();
+        }else{
+            mProgressDialog.dismiss();
+            Toast.makeText(getBaseContext(), "登录失败,用户名不存在或密码错误", Toast.LENGTH_SHORT).show();
+            mBtnLogin.setEnabled(true);
         }
     }
 }

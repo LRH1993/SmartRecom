@@ -140,7 +140,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //更多中  特殊情况  取消选中状态
         menu.getItem(5).getSubMenu().getItem(0).setChecked(false);
         menu.getItem(5).getSubMenu().getItem(1).setChecked(false);
-        menu.getItem(5).getSubMenu().getItem(2).setChecked(false);
         item.setChecked(true);
     }
 
