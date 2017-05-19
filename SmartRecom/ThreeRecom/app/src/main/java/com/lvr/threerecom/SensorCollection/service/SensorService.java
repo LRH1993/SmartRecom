@@ -2,6 +2,7 @@ package com.lvr.threerecom.sensorcollection.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +12,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.lvr.threerecom.sensorcollection.utils.Constant;
 import com.lvr.threerecom.sensorcollection.utils.HttpUtil;
 import com.lvr.threerecom.sensorcollection.utils.JSONUtil;
 import com.lvr.threerecom.sensorcollection.utils.SensorUtil;
+import com.lvr.threerecom.ui.home.NotificationShowActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,8 +54,43 @@ public class SensorService extends Service implements SensorObserver {
             String hint = "您当前的状态为：" + mStrings[msg.what + 1];
             System.out.println(hint);
             Toast.makeText(getApplicationContext(), hint, Toast.LENGTH_LONG).show();
+            updateNotification(hint);
+            if(hint.equals("躺着")||hint.equals("跑步")){
+                //跳转到推送页面
+                recomNotification(hint);
+            }
         }
     };
+
+    /**
+     * 跳转到推送的通知
+     * @param hint
+     */
+    private void recomNotification(String hint) {
+
+    }
+
+    /**
+     * 更新当前通知栏状态
+     * @param hint
+     */
+    private void updateNotification(String hint) {
+        //创建通知
+        Notification.Builder mBuilder = new Notification.Builder(SensorService.this)
+                .setSmallIcon(R.drawable.icon_launcher)
+                .setContentTitle("SmartRecom为你推荐")
+                .setContentText("当前状态为："+hint);
+        //创建点跳转的Intent(这个跳转是跳转到通知详情页)
+        Intent intent = new Intent(SensorService.this,NotificationShowActivity.class);
+        // 设置PendingIntent
+        //获取通知服务
+        mBuilder.setContentIntent(PendingIntent.getActivity(SensorService.this, 0, intent, 0));
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //构建通知
+        Notification notification = mBuilder.build();
+        //显示通知
+        nm.notify(0,notification);
+    }
 
     @Override
     public void onCreate() {
@@ -67,16 +104,31 @@ public class SensorService extends Service implements SensorObserver {
         sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), Constant.samplingRate);
         sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), Constant.samplingRate);
         listener.registerAllObservers(new SensorService());
-
-
-        showNotification("SmartRecom为你推荐", "正在检测您当前的状态");
+        beginForeService();
     }
-
+    private void beginForeService() {
+        //创建通知
+        Notification.Builder mBuilder = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.icon_launcher)
+                .setContentTitle("SmartRecom为你推荐")
+                .setContentText("正在检测您当前的状态");
+        //创建点跳转的Intent(这个跳转是跳转到通知详情页)
+        Intent intent = new Intent(this,NotificationShowActivity.class);
+        // 设置PendingIntent
+        //获取通知服务
+        mBuilder.setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //构建通知
+        Notification notification = mBuilder.build();
+        //显示通知
+        nm.notify(0,notification);
+        //启动前台服务
+        startForeground(0,notification);
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         return super.onStartCommand(intent, flags, startId);
-
-
     }
 
     @Nullable
@@ -155,18 +207,6 @@ public class SensorService extends Service implements SensorObserver {
         super.onDestroy();
     }
 
-    private void showNotification(String title, String text) {
-        System.out.println("创建通知");
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.icon_launcher);
-        builder.setContentTitle(title);
-        builder.setContentText(text);
-        builder.setAutoCancel(true);
-        builder.setOnlyAlertOnce(true);
-        Notification notification = builder.build();
-        //显示通知
-        mNotificationManager.notify(0, notification);
 
-    }
 
 }
