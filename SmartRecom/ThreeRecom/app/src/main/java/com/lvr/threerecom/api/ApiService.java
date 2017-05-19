@@ -4,6 +4,7 @@ import com.lvr.threerecom.bean.LogInAndSignUpBean;
 import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
+import com.lvr.threerecom.bean.RatingResultBean;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
 import com.lvr.threerecom.bean.WrapperSongListInfo;
@@ -89,4 +90,8 @@ public interface ApiService {
     @GET("loginValidation.action")
     Observable<LogInAndSignUpBean> getLogInResult(
             @Query("username") String username, @Query("password") String password);
+    //提交评分
+    @GET("saveRating.action")
+    Observable<RatingResultBean> getRatingResult(
+            @Query("userid") String userid, @Query("movie_id") int movie_id,@Query("rating") int rating);
 }

@@ -3,6 +3,7 @@ package com.lvr.threerecom.ui.movie.model;
 import com.lvr.threerecom.api.ApiService;
 import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.bean.MovieInfo;
+import com.lvr.threerecom.bean.RatingResultBean;
 import com.lvr.threerecom.client.RetrofitClient;
 
 import java.util.List;
@@ -27,5 +28,22 @@ public class MovieModelImpl implements MovieModel{
             }
         }).compose(RetrofitClient.schedulersTransformer);//线程调度
 
+    }
+
+    @Override
+    public Observable<Boolean> loadRatingResult(String userId, int movie_id, int rating) {
+        RetrofitClient retrofitClient = RetrofitClient.getInstance(AppApplication.getAppContext(), ApiService.MOVIE_BASE_URL_TYPE);
+        ApiService api = retrofitClient.create(ApiService.class);
+        return api.getRatingResult(userId,movie_id,rating).map(new Function<RatingResultBean, Boolean>() {
+            @Override
+            public Boolean apply(RatingResultBean bean) throws Exception {
+                String success = bean.getIs_rating_success();
+                if (success.equals("success")){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }).compose(RetrofitClient.schedulersTransformer);//线程调度;
     }
 }

@@ -12,5 +12,5 @@ import io.reactivex.Observable;
 
 public interface MovieModel {
     Observable<List<MovieInfo>> loadMovieByType(int pageSize, int startPage, String tyep, String genres);
-
+    Observable<Boolean> loadRatingResult(String userId, int movie_id, int rating);
 }

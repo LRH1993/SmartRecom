@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.base.BaseActivity;
@@ -157,7 +156,9 @@ public class MovieDetailActivity extends BaseActivity implements View.OnClickLis
                 break;
             }
             case R.id.tv_judge:{
-                Toast.makeText(mContext,"评价还没开始",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MovieDetailActivity.this,MovieJudgeActivity.class);
+                intent.putExtra("id",mInfo.getMovie_id());
+                startActivity(intent);
                 break;
             }
         }

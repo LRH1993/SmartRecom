@@ -115,7 +115,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     private void setBannerItemValues(final BannerViewHolder holder, int position) {
-        if (mImages.size() == 0 && list.size() > 4) {
+        if (mImages.size() == 0 && list.size() >= 4) {
             for (int i = 0; i < 4; i++) {
                 MovieInfo info = list.get(i);
                 mImages.add(info.getMovie_picture_url());
