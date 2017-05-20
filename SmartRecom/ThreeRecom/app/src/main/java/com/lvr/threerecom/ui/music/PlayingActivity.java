@@ -108,6 +108,7 @@ public class PlayingActivity extends BaseActivityWithoutStatus implements View.O
     private boolean isLocal = false;
     private ProgressReceiver mReceiver;
     private int mPosition;
+    private boolean mIsPlaying;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -154,6 +155,7 @@ public class PlayingActivity extends BaseActivityWithoutStatus implements View.O
             mAuthor = (String) extras.get("author");
             mPicUrl = (String) extras.get("picUrl");
             mPosition = (int) extras.get("position");
+            mIsPlaying = (boolean)extras.get("isPlaying");
         }
         setToolBar();
         setUI();
@@ -239,6 +241,12 @@ public class PlayingActivity extends BaseActivityWithoutStatus implements View.O
         mActionBar.setTitle(mTitle + "---" + mAuthor);
         if (!TextUtils.isEmpty(mPicUrl)) {
             new PathAsyncTask(mIvAlbumart).execute(mPicUrl);
+        }
+        float rotation = mIvNeedle.getRotation();
+        if(mIsPlaying&&rotation==-30){
+            mIvNeedle.setRotation(0);
+        }else if(rotation==0){
+            mIvNeedle.setRotation(-30);
         }
         mIvPlayingPlay.setOnClickListener(this);
         mIvPlayingNext.setOnClickListener(this);

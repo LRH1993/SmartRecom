@@ -60,7 +60,7 @@ public class MusicRankingAdapter extends RecyclerView.Adapter<MusicRankingAdapte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, MusicRankingListDetailActivity.class);
-                if (position + 1 == 4) {
+                if (position + 1 == 5) {
                     intent.putExtra("type", 20);
                 } else if (position + 1 == 8) {
                     intent.putExtra("type", 24);
@@ -74,7 +74,9 @@ public class MusicRankingAdapter extends RecyclerView.Adapter<MusicRankingAdapte
                     intent.putExtra("type",25);
                 }else if(position+1==10){
                     intent.putExtra("type",8);
-                }else{
+                }else if(position+1==4){
+                    intent.putExtra("type",100);
+                }else {
                     intent.putExtra("type", position + 1);
                 }
 

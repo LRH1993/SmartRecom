@@ -182,6 +182,8 @@ public class MediaPlayService extends Service {
         String author = info.getSonginfo().getAuthor();
         //封面
         String picUrl = info.getSonginfo().getPic_premium();
+        boolean playing = isPlaying();
+        intent.putExtra("isPlaying",playing);
         intent.putExtra("duration", duration);
         intent.putExtra("position",position);
         intent.putExtra("curPostion", currentTime);
