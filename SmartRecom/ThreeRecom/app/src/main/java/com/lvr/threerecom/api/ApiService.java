@@ -15,11 +15,11 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
+import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
 
@@ -31,7 +31,7 @@ public interface ApiService {
     public static final String MOVIE_BASE_URL_TYPE = "http://121.42.174.147:8080/RecommendMovie/";
     public static final String MOVIE_BASE_URL_HOT = "http://121.42.174.147:8080/RecommendMovie/";
     public static final String MUSIC_BASE_URL = "http://tingapi.ting.baidu.com/v1/restserver/";
-
+    public static final String PHOTO_BASE_URL ="http://121.42.174.147:8080/";
     //获取具体种类的电影
     @GET("getMoviesByPage.action")
     Observable<Map<String, List<MovieInfo>>> getMoiveByType(
@@ -101,13 +101,16 @@ public interface ApiService {
     Observable<RatingResultBean> getRatingResult(
             @Query("userid") String userid, @Query("movie_id") int movie_id,@Query("rating") int rating);
     //上传用户信息到后台
-    @GET("")
+    @GET("addUserInfo.action")
+
+    Observable<LoginBean> uploadUserInformation(@Query("username") String username,
+                                             @Query("nickname") String nickname,
+                                             @Query("age") String age,
+                                             @Query("sex") String sex,
+                                             @Query("movie_preference") String movie_preference,
+                                             @Query("music_preference") String music_preference);
+    //上传图片信息
+    @POST("usersPhoto/")
     @Multipart
-    @FormUrlEncoded
-    Observable<Object> uploadUserInformation(@Field("name") String name,
-                                             @Field(value = "age", encoded = true) int age,
-                                             @Field(value = "gender", encoded = true) String gender,
-                                             @Field(value = "movie", encoded = true) String movie,
-                                             @Field(value = "music", encoded = true) String music,
-                                             @Part MultipartBody.Part photoFile);
+    Observable<Response<Object>> uploadImageFile(@Part MultipartBody.Part MultipartFile);
 }

@@ -24,7 +24,7 @@ public class LogInModelImpl implements LogInModel {
             @Override
             public Boolean apply(LoginBean bean) throws Exception {
                 boolean state = bean.isState();
-                if(state){
+                if(!state){
                     return false;
                 }else{
                     //存储记录登录状态
@@ -38,27 +38,35 @@ public class LogInModelImpl implements LogInModel {
                         SPUtils.setSharedStringData(AppApplication.getAppContext(),"gender","女");
                     }
                     String movie_preference = bean.getMovie_preference();
-                    String[] movie = movie_preference.split(" ");
-                    StringBuffer movie_like = new StringBuffer();
-                    for(int i=0;i<movie.length;i++){
-                        if(i==movie.length-1){
-                            movie_like.append(movie[i]);
-                        }else{
-                            movie_like.append(movie[i]+"、");
+                    if(movie_preference==null){
+                        SPUtils.setSharedStringData(AppApplication.getAppContext(),"movie_preference",null);
+                    }else{
+                        String[] movie = movie_preference.split(" ");
+                        StringBuffer movie_like = new StringBuffer();
+                        for(int i=0;i<movie.length;i++){
+                            if(i==movie.length-1){
+                                movie_like.append(movie[i]);
+                            }else{
+                                movie_like.append(movie[i]+"、");
+                            }
                         }
+                        SPUtils.setSharedStringData(AppApplication.getAppContext(),"movie_preference",movie_like.toString());
                     }
-                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"movie_preference",movie_like.toString());
                     String music_preference = bean.getMusic_preference();
-                    String[] music = music_preference.split(" ");
-                    StringBuffer music_like = new StringBuffer();
-                    for(int i=0;i<music.length;i++){
-                        if(i==music.length-1){
-                            music_like.append(music[i]);
-                        }else{
-                            music_like.append(music[i]+"、");
+                    if(music_preference==null){
+                        SPUtils.setSharedStringData(AppApplication.getAppContext(),"music_preference",null);
+                    }else{
+                        String[] music = music_preference.split(" ");
+                        StringBuffer music_like = new StringBuffer();
+                        for(int i=0;i<music.length;i++){
+                            if(i==music.length-1){
+                                music_like.append(music[i]);
+                            }else{
+                                music_like.append(music[i]+"、");
+                            }
                         }
+                        SPUtils.setSharedStringData(AppApplication.getAppContext(),"music_preference",music_like.toString());
                     }
-                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"music_preference",music_like.toString());
                     SPUtils.setSharedStringData(AppApplication.getAppContext(),"photoUrl",bean.getUser_photo_url());
                     SPUtils.setSharedlongData(AppApplication.getAppContext(), "loginDate", System.currentTimeMillis());
                     EventBus.getDefault().post(bean);

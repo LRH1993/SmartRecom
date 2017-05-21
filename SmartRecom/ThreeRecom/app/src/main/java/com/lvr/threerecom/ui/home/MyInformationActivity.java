@@ -33,14 +33,17 @@ import android.widget.Toast;
 import com.aspsine.irecyclerview.IRecyclerView;
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.adapter.InformationAdapter;
+import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.base.BaseActivity;
 import com.lvr.threerecom.bean.FavorListBean;
 import com.lvr.threerecom.bean.InformationBean;
+import com.lvr.threerecom.bean.LoginBean;
 import com.lvr.threerecom.ui.home.presenter.impl.InformationPresenterImpl;
 import com.lvr.threerecom.ui.home.view.InformationView;
 import com.lvr.threerecom.utils.BitmapUtils;
 import com.lvr.threerecom.utils.CapturePhotoHelper;
 import com.lvr.threerecom.utils.FolderManager;
+import com.lvr.threerecom.utils.SPUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -84,7 +87,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
 
     private CapturePhotoHelper mCapturePhotoHelper;
     private File mRestorePhotoFile;
-    private File tempFile = new File(Environment.getExternalStorageDirectory(), "temp_photo.jpg");
+    private File tempFile = new File(Environment.getExternalStorageDirectory(), SPUtils.getSharedStringData(AppApplication.getAppContext(),"userid")+".jpg");
 
     @Override
     public int getLayoutId() {
@@ -122,15 +125,77 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
      * 把数据上传到服务器进行保存
      */
     private void saveInforamtion() {
-        if(isTextChange){
-            //上传文本信息
-        }
-        if(isPhotoChange){
-            //上传图片信息
 
+        if (isTextChange) {
+            //上传文本信息
+            String nickname = mList.get(1).getContent();
+            String age = mList.get(2).getContent();
+            String gender = mList.get(3).getContent();
+            String movie = mList.get(4).getContent();
+            String music = mList.get(5).getContent();
+            String userid = SPUtils.getSharedStringData(AppApplication.getAppContext(), "userid");
+            if (gender.equals("男")) {
+                gender = "M";
+            } else if (gender.equals("女")) {
+                gender = "F";
+            } else {
+                gender = null;
+            }
+            if (age.equals("未设置")) {
+                age = null;
+            }
+            if (nickname.equals("未设置")) {
+                nickname = null;
+            }
+            if (movie.equals("未设置")) {
+                movie = null;
+            }
+            if (music.equals("未设置")) {
+                music = null;
+            }
+            mPresenter.requestUpdateInformation(userid, nickname, age, gender, movie, music);
+            //在SharedPreference中更新信息
+            SPUtils.setSharedStringData(AppApplication.getAppContext(), "nickname", nickname);
+            SPUtils.setSharedStringData(AppApplication.getAppContext(), "age", age);
+            if (gender == null) {
+                SPUtils.setSharedStringData(AppApplication.getAppContext(), "gender", null);
+            } else {
+                if (gender.equals("M")) {
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "gender", "男");
+                } else {
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "gender", "女");
+                }
+            }
+            SPUtils.setSharedStringData(AppApplication.getAppContext(), "movie_preference", movie);
+            SPUtils.setSharedStringData(AppApplication.getAppContext(), "music_preference", music);
         }
-        if(tempFile.exists()){
-            tempFile.delete();
+        if (isPhotoChange) {
+            //上传图片信息
+            String url = mList.get(0).getContent();
+            if(url.equals("default")){
+                SPUtils.setSharedStringData(AppApplication.getAppContext(), "photoUrl", null);
+            }else{
+                SPUtils.setSharedStringData(AppApplication.getAppContext(), "photoUrl", url);
+                String userid = SPUtils.getSharedStringData(AppApplication.getAppContext(), "userid");
+                mPresenter.requestUpdatePhoto(userid,url);
+            }
+        }
+        if(isPhotoChange||isTextChange){
+            //通知MainActivity更新UI
+            LoginBean bean = new LoginBean();
+            String url = mList.get(0).getContent();
+            if(url.equals("default")){
+                bean.setUser_photo_url(null);
+            }else{
+                bean.setUser_photo_url(url);
+            }
+            String nickname = mList.get(1).getContent();
+            if(nickname.equals("未设置")){
+                bean.setNickname(null);
+            }else{
+                bean.setNickname(nickname);
+            }
+            EventBus.getDefault().post(bean);
         }
 
     }
@@ -150,6 +215,24 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
         mList.addAll(informationBeanList);
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void returnUpdateInformationResult(boolean result) {
+        if (result) {
+            Toast.makeText(MyInformationActivity.this, "成功上传信息", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MyInformationActivity.this, "上传信息失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void returnUpdatePhotoResult(boolean result) {
+        if (result) {
+            Toast.makeText(MyInformationActivity.this, "成功上传头像", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MyInformationActivity.this, "上传头像失败", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -536,7 +619,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             //获取选择图片后图片路径
 
             if (resultCode == RESULT_OK) {
-                Uri uri =  data.getData();
+                Uri uri = data.getData();
                 Intent intent = new Intent("com.android.camera.action.CROP");
                 intent.setDataAndType(uri, "image/*");
                 intent.putExtra("aspectX", 1);
@@ -555,10 +638,11 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
 
             //更新UI 显示图像
             InformationBean informationBean = mList.get(0);
+            System.out.println("adapter中图片url:"+tempFile.getAbsolutePath().toString());
             informationBean.setContent(tempFile.getAbsoluteFile().toString());
             informationBean.setSet(true);
             mAdapter.notifyItemChanged(0);
-            isPhotoChange =true;
+            isPhotoChange = true;
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);

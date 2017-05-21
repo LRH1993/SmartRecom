@@ -27,6 +27,12 @@ public class SignUpModelImpl implements SignUpModel {
                     SPUtils.setSharedBooleanData(AppApplication.getAppContext(),"isLogin",true);
                     SPUtils.setSharedStringData(AppApplication.getAppContext(),"userid",username);
                     SPUtils.setSharedlongData(AppApplication.getAppContext(), "loginDate", System.currentTimeMillis());
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"nickname",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "age", null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"gender",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"movie_preference",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"music_preference",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"photoUrl",null);
                     return true;
                 } else {
                     return false;

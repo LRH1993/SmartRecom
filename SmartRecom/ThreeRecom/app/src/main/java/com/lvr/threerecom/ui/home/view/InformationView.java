@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface InformationView {
     void returnInformation(List<InformationBean> informationBeanList);
+    void returnUpdateInformationResult(boolean result);
+    void returnUpdatePhotoResult(boolean result);
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -19,12 +20,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aspsine.irecyclerview.IRecyclerView;
 import com.aspsine.irecyclerview.OnRefreshListener;
 import com.lvr.threerecom.R;
+import com.lvr.threerecom.adapter.InformationAdapter;
 import com.lvr.threerecom.adapter.MainAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
@@ -41,16 +45,19 @@ import com.lvr.threerecom.ui.login.LoginActivity;
 import com.lvr.threerecom.ui.movie.MovieDetailActivity;
 import com.lvr.threerecom.ui.movie.MovieDisplayActivity;
 import com.lvr.threerecom.ui.music.MusicActivity;
+import com.lvr.threerecom.utils.BitmapUtils;
 import com.lvr.threerecom.utils.ImageLoaderUtils;
 import com.lvr.threerecom.utils.SPUtils;
 import com.lvr.threerecom.utils.StatusBarSetting;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.Subscribe;
+import de.greenrobot.event.ThreadMode;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MainView, OnRefreshListener, MainAdapter.onItemClickListenr {
 
@@ -65,10 +72,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private MainAdapter mMainAdapter;
     private List<MovieInfo> mList = new ArrayList<>();
     private MainPresenterImpl mPresenter;
-    private boolean isLogin =true;
     private AlertDialog mDialog;
     private ImageView mIv_photo;
     private TextView mMTv_login;
+    private Intent mIntent;
 
     @Override
     public int getLayoutId() {
@@ -155,10 +162,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void initSensorService() {
         //已经登录后再开启采集数据
         if(SPUtils.getSharedBooleanData(AppApplication.getAppContext(), "isLogin")){
-            Intent intent = new Intent();
-            intent.setAction("com.sensor.service");
-            intent.setPackage(getPackageName());
-            startService(intent);
+            mIntent = new Intent();
+            mIntent.setAction("com.sensor.service");
+            mIntent.setPackage(getPackageName());
+            startService(mIntent);
         }
     }
 
@@ -221,13 +228,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
      * 接收到登录成功的消息
      * @param bean
      */
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MainThread)
     public void onLogInEvent(LoginBean bean) {
+        System.out.println("更新MainActivity中的UI");
         String url = bean.getUser_photo_url();
         if(url!=null&&!url.isEmpty()){
             //更新头像
             if(mIv_photo!=null){
-                ImageLoaderUtils.displayRound(MainActivity.this,mIv_photo,url);
+                if(url.startsWith("http")){
+                    //网络图片
+                    ImageLoaderUtils.displayRound(MainActivity.this,mIv_photo,url);
+                }else{
+                    //本地图片
+                    final File file = new File(url);
+                    mIv_photo.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            mIv_photo.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            int mWidth = mIv_photo.getMeasuredWidth();
+                            int mHeight = mIv_photo.getMeasuredHeight();
+                            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(file, mWidth, mHeight);
+                            if (bitmap != null) {
+                                //检查是否有被旋转，并进行纠正
+                                int degree = BitmapUtils.getBitmapDegree(file.getAbsolutePath());
+                                if (degree != 0) {
+                                    bitmap = BitmapUtils.rotateBitmapByDegree(bitmap, degree);
+                                }
+                                mIv_photo.setImageBitmap(bitmap);
+                            }
+
+                        }
+                    });
+                }
+                System.out.println("图片url:"+url);
             }
         }
         String nickname = bean.getNickname();
@@ -298,7 +331,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 break;
             }
             case R.id.mn_information:{
-                if(isLogin){
+                if(SPUtils.getSharedBooleanData(AppApplication.getAppContext(),"isLogin")){
                     //已经登录了
                     Intent intent = new Intent(MainActivity.this, MyInformationActivity.class);
                     startActivity(intent);
@@ -324,6 +357,40 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 //跳转到关于页面
                 Intent intent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(intent);
+                break;
+            }
+            case R.id.mn_out:{
+                //注销登录
+                if(SPUtils.getSharedBooleanData(AppApplication.getAppContext(),"isLogin")){
+                    //1.清除SharedPreference中的内容
+                    SPUtils.setSharedBooleanData(AppApplication.getAppContext(),"isLogin",false);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "nickname",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "age",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "gender",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "movie_preference",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(), "music_preference",null);
+                    SPUtils.setSharedlongData(AppApplication.getAppContext(),"loginDate",0);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"userid",null);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"photoUrl",null);
+                    //2.关闭服务
+                    if(mIntent!=null){
+                        stopService(mIntent);
+                    }
+                    //3.页面回显
+                    mMTv_login.setText("点击头像登录,开启更多功能");
+                    mIv_photo.setImageResource(R.drawable.nav_photo);
+                    mIv_photo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            LoginActivity.startAction(MainActivity.this);
+                        }
+                    });
+                    Toast.makeText(MainActivity.this,"注销成功",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"还未登录",Toast.LENGTH_SHORT).show();
+                }
+
+
                 break;
             }
 

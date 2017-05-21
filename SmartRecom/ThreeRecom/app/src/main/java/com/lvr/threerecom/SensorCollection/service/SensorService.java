@@ -49,8 +49,6 @@ public class SensorService extends Service implements SensorObserver {
     private SensorListener listener;
     private  int state = AppConstantValue.SENSOR_STATE_ERROR;
     private static final int MSG_SET_ALIAS = 1001;
-    private int[] state_collect = new int[3];
-    private int count = 0;
     private static String[] mStrings = {"无意义", "坐着", "站着", "躺着", "走路", "骑车", "上楼梯", "下楼梯", "跑步"};
     private NotificationManager mNotificationManager;
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
