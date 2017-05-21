@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aspsine.irecyclerview.IRecyclerView;
 import com.aspsine.irecyclerview.OnRefreshListener;
@@ -27,8 +28,10 @@ import com.lvr.threerecom.R;
 import com.lvr.threerecom.adapter.MainAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
+import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.base.BaseActivity;
+import com.lvr.threerecom.bean.LoginBean;
 import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.ui.home.AboutActivity;
 import com.lvr.threerecom.ui.home.MyInformationActivity;
@@ -38,12 +41,16 @@ import com.lvr.threerecom.ui.login.LoginActivity;
 import com.lvr.threerecom.ui.movie.MovieDetailActivity;
 import com.lvr.threerecom.ui.movie.MovieDisplayActivity;
 import com.lvr.threerecom.ui.music.MusicActivity;
+import com.lvr.threerecom.utils.ImageLoaderUtils;
+import com.lvr.threerecom.utils.SPUtils;
 import com.lvr.threerecom.utils.StatusBarSetting;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MainView, OnRefreshListener, MainAdapter.onItemClickListenr {
 
@@ -60,6 +67,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private MainPresenterImpl mPresenter;
     private boolean isLogin =true;
     private AlertDialog mDialog;
+    private ImageView mIv_photo;
+    private TextView mMTv_login;
 
     @Override
     public int getLayoutId() {
@@ -78,18 +87,79 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         setNavigationView();
         initData();
         mPresenter.requestHotMoviee();
+        initLoginState();
         initSensorService();
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
+        updateLoginUI();
 
+    }
+
+    /**
+     * 判断状态为登录后 更新UI
+     */
+    private void updateLoginUI() {
+        Boolean isLogin = SPUtils.getSharedBooleanData(AppApplication.getAppContext(), "isLogin");
+        if(isLogin){
+            String nickname = SPUtils.getSharedStringData(AppApplication.getAppContext(), "nickname");
+            String userid = SPUtils.getSharedStringData(AppApplication.getAppContext(), "userid");
+            String age = SPUtils.getSharedStringData(AppApplication.getAppContext(), "age");
+            String gender = SPUtils.getSharedStringData(AppApplication.getAppContext(), "gender");
+            String movie_preference = SPUtils.getSharedStringData(AppApplication.getAppContext(), "movie_preference");
+            String music_preference = SPUtils.getSharedStringData(AppApplication.getAppContext(), "music_preference");
+            String url = SPUtils.getSharedStringData(AppApplication.getAppContext(), "photoUrl");
+            LoginBean loginBean = new LoginBean();
+            if(!nickname.isEmpty()){
+                loginBean.setNickname(nickname);
+            }
+            if(!age.isEmpty()){
+                loginBean.setAge(Integer.parseInt(age));
+            }
+            if(!movie_preference.isEmpty()){
+                loginBean.setMovie_preference(movie_preference);
+            }
+            if(!music_preference.isEmpty()){
+                loginBean.setMusic_preference(music_preference);
+            }
+            if(!userid.isEmpty()){
+                loginBean.setUserid(userid);
+            }
+            if(!gender.isEmpty()){
+                loginBean.setSex(gender);
+            }
+            if(!url.isEmpty()){
+                loginBean.setUser_photo_url(url);
+            }
+            EventBus.getDefault().post(loginBean);
+        }
+    }
+
+    /**
+     * 初始化登录状态 默认登陆保持7天
+     */
+    private void initLoginState() {
+        Boolean isLogin = SPUtils.getSharedBooleanData(AppApplication.getAppContext(), "isLogin");
+        if(isLogin){
+            //查看登录日期有没有保持7天
+            long date = SPUtils.getSharedlongData(AppApplication.getAppContext(), "loginDate");
+            if(System.currentTimeMillis()-date>7*24*3600*1000){
+                SPUtils.setSharedBooleanData(AppApplication.getAppContext(), "isLogin",false);
+            }
+        }
     }
 
     /**
      * 开启传感器采集数据的远程进程
      */
     private void initSensorService() {
-        Intent intent = new Intent();
-        intent.setAction("com.sensor.service");
-        intent.setPackage(getPackageName());
-        startService(intent);
+        //已经登录后再开启采集数据
+        if(SPUtils.getSharedBooleanData(AppApplication.getAppContext(), "isLogin")){
+            Intent intent = new Intent();
+            intent.setAction("com.sensor.service");
+            intent.setPackage(getPackageName());
+            startService(intent);
+        }
     }
 
     /**
@@ -119,9 +189,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //NavigationView初始化
         mNavigation.setItemIconTintList(null);
         View headerView = mNavigation.getHeaderView(0);
+        mIv_photo = (ImageView) headerView.findViewById(R.id.iv_user_photo);
+        mMTv_login = (TextView) headerView.findViewById(R.id.tv_login);
         mNavigation.setNavigationItemSelectedListener(this);
         setHomeItemState();
-        login(headerView);
+        login();
 
     }
 
@@ -129,6 +201,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onRestart() {
         super.onRestart();
         setHomeItemState();
+        //在登陆后的状态下，再次开启采集数据
+        initSensorService();
     }
 
     /**
@@ -144,13 +218,44 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     /**
+     * 接收到登录成功的消息
+     * @param bean
+     */
+    @Subscribe
+    public void onLogInEvent(LoginBean bean) {
+        String url = bean.getUser_photo_url();
+        if(url!=null&&!url.isEmpty()){
+            //更新头像
+            if(mIv_photo!=null){
+                ImageLoaderUtils.displayRound(MainActivity.this,mIv_photo,url);
+            }
+        }
+        String nickname = bean.getNickname();
+        if(nickname!=null&&!nickname.isEmpty()){
+            if(mMTv_login!=null){
+                mMTv_login.setText(nickname);
+            }
+        }else{
+            if(mMTv_login!=null){
+                mMTv_login.setText("已登录，完善信息为你提供更多服务");
+            }
+        }
+        mIv_photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //跳转到完善信息页面
+                Intent intent = new Intent(MainActivity.this, MyInformationActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    /**
      * 跳转到登录界面
      *
-     * @param view
      */
-    private void login(View view) {
-        ImageView iv_photo = (ImageView) view.findViewById(R.id.iv_user_photo);
-        iv_photo.setOnClickListener(new View.OnClickListener() {
+    private void login() {
+
+        mIv_photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginActivity.startAction(MainActivity.this);

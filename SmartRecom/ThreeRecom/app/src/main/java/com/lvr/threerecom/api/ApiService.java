@@ -1,10 +1,11 @@
 package com.lvr.threerecom.api;
 
-import com.lvr.threerecom.bean.LogInAndSignUpBean;
+import com.lvr.threerecom.bean.LoginBean;
 import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
 import com.lvr.threerecom.bean.RatingResultBean;
+import com.lvr.threerecom.bean.SignupBean;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
 import com.lvr.threerecom.bean.WrapperSongListInfo;
@@ -19,7 +20,6 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
-import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
 
@@ -90,18 +90,18 @@ public interface ApiService {
                                              @Query("songid") String songid);
     //注册请求 暂时为GET方法 后期转换为POST方法 还有加密
     @GET("register.action")
-    Observable<LogInAndSignUpBean> getSignUpResult(
+    Observable<SignupBean> getSignUpResult(
             @Query("username") String username, @Query("password") String password);
     //登录请求 暂时为GET方法 后期转换为POST方法 还有加密
     @GET("loginValidation.action")
-    Observable<LogInAndSignUpBean> getLogInResult(
+    Observable<LoginBean> getLogInResult(
             @Query("username") String username, @Query("password") String password);
     //提交评分
     @GET("saveRating.action")
     Observable<RatingResultBean> getRatingResult(
             @Query("userid") String userid, @Query("movie_id") int movie_id,@Query("rating") int rating);
     //上传用户信息到后台
-    @POST("")
+    @GET("")
     @Multipart
     @FormUrlEncoded
     Observable<Object> uploadUserInformation(@Field("name") String name,

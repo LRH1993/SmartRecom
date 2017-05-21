@@ -21,13 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lvr.threerecom.R;
+import com.lvr.threerecom.app.AppApplication;
 import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.base.BaseActivity;
+import com.lvr.threerecom.bean.LoginBean;
 import com.lvr.threerecom.ui.login.presenter.impl.LogInPresenterImpl;
 import com.lvr.threerecom.ui.login.view.LogInView;
+import com.lvr.threerecom.utils.SPUtils;
 import com.lvr.threerecom.utils.StatusBarSetting;
 
 import butterknife.BindView;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by lvr on 2017/4/23.
@@ -196,8 +200,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == AppConstantValue.REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
+                //注册成功更新UI
+                LoginBean loginBean = new LoginBean();
+                loginBean.setUserid(SPUtils.getSharedStringData(AppApplication.getAppContext(),"userid"));
+                EventBus.getDefault().post(loginBean);
                 this.finish();
-                // TODO: 2017/5/19 执行更新UI的操作
             }
         }
     }

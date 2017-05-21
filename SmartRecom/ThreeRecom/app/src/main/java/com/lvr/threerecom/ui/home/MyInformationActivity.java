@@ -71,7 +71,10 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
     private Context mContext;
     private final static String TAG = MyInformationActivity.class.getSimpleName();
     private final static String EXTRA_RESTORE_PHOTO = "extra_restore_photo";
-
+    //监听文本信息是否变化了
+    private boolean isTextChange;
+    //监听图片信息是否变化了
+    private boolean isPhotoChange;
     //选取图片并裁剪
     private final static int REQUEST_PICKER_AND_CROP = 2;
     /**
@@ -119,8 +122,13 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
      * 把数据上传到服务器进行保存
      */
     private void saveInforamtion() {
+        if(isTextChange){
+            //上传文本信息
+        }
+        if(isPhotoChange){
+            //上传图片信息
 
-
+        }
         if(tempFile.exists()){
             tempFile.delete();
         }
@@ -165,6 +173,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             bean.setSet(true);
             bean.setContent(buffer.toString());
             mAdapter.notifyItemChanged(4);
+            isTextChange = true;
         } else {
             List<String> list = info.getList();
             InformationBean bean = mList.get(5);
@@ -179,6 +188,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             bean.setSet(true);
             bean.setContent(buffer.toString());
             mAdapter.notifyItemChanged(5);
+            isTextChange = true;
         }
 
     }
@@ -261,6 +271,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                         bean.setSet(true);
                         bean.setContent(editText.getText().toString());
                         mAdapter.notifyItemChanged(1);
+                        isTextChange = true;
                     }
                     dialog.dismiss();
                 }
@@ -293,6 +304,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                         bean.setSet(true);
                         bean.setContent(editText.getText().toString());
                         mAdapter.notifyItemChanged(2);
+                        isTextChange = true;
                     }
                     dialog.dismiss();
                 }
@@ -334,6 +346,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
                         bean.setSet(true);
                     }
                     mAdapter.notifyItemChanged(3);
+                    isTextChange = true;
                     dialog.dismiss();
                 }
             });
@@ -517,6 +530,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             informationBean.setContent(photoFile.getAbsoluteFile().toString());
             informationBean.setSet(true);
             mAdapter.notifyItemChanged(0);
+            isPhotoChange = true;
 
         } else if (requestCode == REQUEST_PICK_IMAGE) {
             //获取选择图片后图片路径
@@ -544,6 +558,7 @@ public class MyInformationActivity extends BaseActivity implements InformationVi
             informationBean.setContent(tempFile.getAbsoluteFile().toString());
             informationBean.setSet(true);
             mAdapter.notifyItemChanged(0);
+            isPhotoChange =true;
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);

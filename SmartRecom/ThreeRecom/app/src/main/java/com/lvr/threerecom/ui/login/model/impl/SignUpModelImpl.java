@@ -2,9 +2,10 @@ package com.lvr.threerecom.ui.login.model.impl;
 
 import com.lvr.threerecom.api.ApiService;
 import com.lvr.threerecom.app.AppApplication;
-import com.lvr.threerecom.bean.LogInAndSignUpBean;
+import com.lvr.threerecom.bean.SignupBean;
 import com.lvr.threerecom.client.RetrofitClient;
 import com.lvr.threerecom.ui.login.model.SignUpModel;
+import com.lvr.threerecom.utils.SPUtils;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -15,16 +16,19 @@ import io.reactivex.functions.Function;
 
 public class SignUpModelImpl implements SignUpModel {
     @Override
-    public Observable<Boolean> loadSignUp(String username, String password) {
+    public Observable<Boolean> loadSignUp(final String username, String password) {
         RetrofitClient retrofitClient = RetrofitClient.getInstance(AppApplication.getAppContext(), ApiService.MOVIE_BASE_URL_TYPE);
         ApiService api = retrofitClient.create(ApiService.class);
-        return api.getSignUpResult(username,password).map(new Function<LogInAndSignUpBean, Boolean>() {
+        return api.getSignUpResult(username,password).map(new Function<SignupBean, Boolean>() {
             @Override
-            public Boolean apply(LogInAndSignUpBean bean) throws Exception {
+            public Boolean apply(SignupBean bean) throws Exception {
                 String info = bean.getRegister_prompt_info();
-                if(info.equals("嘻嘻，注册成功！")){
+                if (info.equals("嘻嘻，注册成功！")) {
+                    SPUtils.setSharedBooleanData(AppApplication.getAppContext(),"isLogin",true);
+                    SPUtils.setSharedStringData(AppApplication.getAppContext(),"userid",username);
+                    SPUtils.setSharedlongData(AppApplication.getAppContext(), "loginDate", System.currentTimeMillis());
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }

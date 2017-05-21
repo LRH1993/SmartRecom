@@ -97,8 +97,7 @@ public class SensorService extends Service implements SensorObserver {
         System.out.println("开启服务");
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        //注册后才开启采集数据的功能
-        // TODO: 2017/5/20 记得写入SharedPreferences 
+        //登录后才开启采集数据的功能
         if(SPUtils.getSharedBooleanData(AppApplication.getAppContext(),"isLogin")){
             mUserid = SPUtils.getSharedStringData(AppApplication.getAppContext(), "userid");
             setAlias();

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.lvr.threerecom.R;
 import com.lvr.threerecom.bean.InformationBean;
 import com.lvr.threerecom.utils.BitmapUtils;
+import com.lvr.threerecom.utils.ImageLoaderUtils;
 
 import java.io.File;
 import java.util.List;
@@ -67,28 +68,30 @@ public class InformationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((SpecialViewHolder) holder).mTextView.setText(bean.getTitle());
             if(bean.isSet()){
                 String content = bean.getContent();
-                final File file = new File(content);
-                ((SpecialViewHolder) holder).mImageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        ((SpecialViewHolder) holder).mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        mWidth = ((SpecialViewHolder) holder).mImageView.getMeasuredWidth();
-                        mHeight = ((SpecialViewHolder) holder).mImageView.getMeasuredHeight();
-                        Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(file, mWidth, mHeight);
-                        if (bitmap != null) {
-                            //检查是否有被旋转，并进行纠正
-                            int degree = BitmapUtils.getBitmapDegree(file.getAbsolutePath());
-                            if (degree != 0) {
-                                bitmap = BitmapUtils.rotateBitmapByDegree(bitmap, degree);
+                if(content.startsWith("http")){
+                    //网络图片
+                    ImageLoaderUtils.displayRound(context, ((SpecialViewHolder) holder).mImageView,content);
+                }else{
+                    final File file = new File(content);
+                    ((SpecialViewHolder) holder).mImageView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            ((SpecialViewHolder) holder).mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            mWidth = ((SpecialViewHolder) holder).mImageView.getMeasuredWidth();
+                            mHeight = ((SpecialViewHolder) holder).mImageView.getMeasuredHeight();
+                            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(file, mWidth, mHeight);
+                            if (bitmap != null) {
+                                //检查是否有被旋转，并进行纠正
+                                int degree = BitmapUtils.getBitmapDegree(file.getAbsolutePath());
+                                if (degree != 0) {
+                                    bitmap = BitmapUtils.rotateBitmapByDegree(bitmap, degree);
+                                }
+                                ((SpecialViewHolder) holder).mImageView.setImageBitmap(bitmap);
                             }
-                            ((SpecialViewHolder) holder).mImageView.setImageBitmap(bitmap);
+
                         }
-
-                    }
-                });
-
-
-
+                    });
+                }
             }else{
                 ((SpecialViewHolder) holder).mImageView.setImageResource(R.drawable.nav_photo);
             }

@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:textSize="12sp"
-        android:text="点击头像登录"
+        android:text="点击头像登录,开启更多功能"
         android:textColor="@color/white"
         android:padding="8dp"
         android:layout_marginLeft="20dp"
