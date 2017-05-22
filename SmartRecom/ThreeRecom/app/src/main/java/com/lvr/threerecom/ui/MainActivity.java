@@ -391,6 +391,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 break;
             }
+            case R.id.mn_guess:{
+                Toast.makeText(MainActivity.this,"该功能还未实现，敬请期待",Toast.LENGTH_SHORT).show();
+                break;
+            }
 
         }
         item.setChecked(true);

@@ -65,7 +65,7 @@ public class RecomMovieActivity extends BaseActivity implements RecomMovieView,O
     @Override
     public void initView() {
         mContext =this;
-        mToolbar.setTitle("推荐电影");
+        mToolbar.setTitle("电影推荐");
         mToolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(mToolbar);
         mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);

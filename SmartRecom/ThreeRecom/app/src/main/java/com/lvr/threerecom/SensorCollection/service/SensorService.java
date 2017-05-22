@@ -25,6 +25,7 @@ import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.sensorcollection.utils.Constant;
 import com.lvr.threerecom.sensorcollection.utils.HttpUtil;
 import com.lvr.threerecom.sensorcollection.utils.JSONUtil;
+import com.lvr.threerecom.ui.MainActivity;
 import com.lvr.threerecom.ui.home.RecomMovieActivity;
 import com.lvr.threerecom.ui.home.RecomMusicActivity;
 import com.lvr.threerecom.utils.SPUtils;
@@ -100,7 +101,7 @@ public class SensorService extends Service implements SensorEventListener {
                     }else if(curState.equals("跑步")){
                         intent = new Intent(SensorService.this, RecomMusicActivity.class);
                     }else{
-                        intent = new Intent(SensorService.this, RecomMovieActivity.class);
+                        intent = new Intent(SensorService.this, MainActivity.class);
                     }
 
                     // 设置PendingIntent
