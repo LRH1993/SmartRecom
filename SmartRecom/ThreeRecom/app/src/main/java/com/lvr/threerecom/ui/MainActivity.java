@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.aspsine.irecyclerview.IRecyclerView;
 import com.aspsine.irecyclerview.OnRefreshListener;
 import com.lvr.threerecom.R;
-import com.lvr.threerecom.adapter.InformationAdapter;
 import com.lvr.threerecom.adapter.MainAdapter;
 import com.lvr.threerecom.anims.LandingAnimator;
 import com.lvr.threerecom.anims.ScaleInAnimationAdapter;
@@ -230,7 +229,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
      */
     @Subscribe(threadMode = ThreadMode.MainThread)
     public void onLogInEvent(LoginBean bean) {
-        System.out.println("更新MainActivity中的UI");
         String url = bean.getUser_photo_url();
         if(url!=null&&!url.isEmpty()){
             //更新头像

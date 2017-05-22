@@ -46,8 +46,9 @@
         <activity android:name=".ui.home.OpenSourceActivity"></activity>
         <activity android:name=".ui.home.ContactAuthorActivity"></activity>
         <activity android:name=".ui.home.IntroductionActivity"></activity>
-        <activity android:name=".ui.home.NotificationShowActivity"></activity>
+        <activity android:name=".ui.home.RecomMovieActivity"></activity>
         <activity android:name=".ui.movie.MovieJudgeActivity"></activity>
+        <activity android:name=".ui.home.RecomMusicActivity"></activity>
 
 
         <service
