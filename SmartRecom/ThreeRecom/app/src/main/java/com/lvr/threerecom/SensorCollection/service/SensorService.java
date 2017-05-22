@@ -25,9 +25,8 @@ import com.lvr.threerecom.app.AppConstantValue;
 import com.lvr.threerecom.sensorcollection.utils.Constant;
 import com.lvr.threerecom.sensorcollection.utils.HttpUtil;
 import com.lvr.threerecom.sensorcollection.utils.JSONUtil;
-import com.lvr.threerecom.ui.MainActivity;
-import com.lvr.threerecom.ui.home.RecomMusicActivity;
 import com.lvr.threerecom.ui.home.RecomMovieActivity;
+import com.lvr.threerecom.ui.home.RecomMusicActivity;
 import com.lvr.threerecom.utils.SPUtils;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class SensorService extends Service implements SensorEventListener {
     private static final int MSG_SET_ALIAS = 1001;
     private static final int MSG_STATE_CHANGE =404;
     private static String[] mStrings = {"无意义", "坐着", "站着", "躺着", "走路", "骑车", "上楼梯", "下楼梯", "跑步"};
-    private int[] sensor_collect = new int[3];
+    private int[] sensor_collect = new int[2];
     private int count;
     //用户id
     private String mUserid;
@@ -101,7 +100,7 @@ public class SensorService extends Service implements SensorEventListener {
                     }else if(curState.equals("跑步")){
                         intent = new Intent(SensorService.this, RecomMusicActivity.class);
                     }else{
-                        intent = new Intent(SensorService.this, MainActivity.class);
+                        intent = new Intent(SensorService.this, RecomMovieActivity.class);
                     }
 
                     // 设置PendingIntent
@@ -238,7 +237,7 @@ public class SensorService extends Service implements SensorEventListener {
 
                         sensor_collect[count]=Integer.parseInt(response);
                         count++;
-                        if (count == 3) {
+                        if (count == 2) {
                             count=0;
                             if (isSteady()) {
                                 //当前状态
@@ -265,7 +264,7 @@ public class SensorService extends Service implements SensorEventListener {
      * @return
      */
     private boolean isSteady() {
-        if(sensor_collect[0]==sensor_collect[1]&&sensor_collect[1]==sensor_collect[2]){
+        if(sensor_collect[0]==sensor_collect[1]){
             return true;
         }else{
             return false;

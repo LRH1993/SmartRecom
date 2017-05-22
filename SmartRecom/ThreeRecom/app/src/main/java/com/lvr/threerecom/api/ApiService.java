@@ -5,6 +5,7 @@ import com.lvr.threerecom.bean.MovieInfo;
 import com.lvr.threerecom.bean.RankingListDetail;
 import com.lvr.threerecom.bean.RankingListItem;
 import com.lvr.threerecom.bean.RatingResultBean;
+import com.lvr.threerecom.bean.RecomMusicBean;
 import com.lvr.threerecom.bean.SignupBean;
 import com.lvr.threerecom.bean.SongDetailInfo;
 import com.lvr.threerecom.bean.SongListDetail;
@@ -113,4 +114,12 @@ public interface ApiService {
     @POST("usersPhoto/")
     @Multipart
     Observable<Response<Object>> uploadImageFile(@Part MultipartBody.Part MultipartFile);
+    //推荐歌曲
+    @GET("ting")
+    @Headers("user-agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    Observable<RecomMusicBean> getRecomMusicList(@Query("from") String from,
+                                                 @Query("version") String version,
+                                                 @Query("format") String format,
+                                                 @Query("method") String method,
+                                                 @Query("num") int num);
 }

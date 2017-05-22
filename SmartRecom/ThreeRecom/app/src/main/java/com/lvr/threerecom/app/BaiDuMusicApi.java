@@ -32,7 +32,7 @@ public class BaiDuMusicApi {
     public static class Album {
 
         /**
-         * 推荐唱片  代表新碟上架
+         * 新碟上架
          *
          * @param offset 偏移量
          * @param limmit 获取数量
