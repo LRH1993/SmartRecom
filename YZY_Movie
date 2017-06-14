@@ -1,0 +1,46 @@
+推荐电影接口如下：
+
+1该请求返回为用户推荐的5部电影（推荐电影的数量0-5个）
+http://121.42.174.147:8080/RecommendMovie/getRecommendedMoviesByOurAlgorithm.action?userid=1
+
+2该请求返回movie的详细信息（应该注意电影不存在的情况）
+http://121.42.174.147:8080/RecommendMovie/getMovieDetail.action?movie_id=1
+
+3返回当前一天评价次数最多的电影（0-8部）
+http://121.42.174.147:8080/RecommendMovie/getHotMovies.action
+
+4电影的分页
+pageSize：每页电影的数量（可能也没有12个），
+pageNow：当前页
+type：有三种取值 
+     1）byGenres：按照电影的流派
+     2）byReleaseTime 按照发行时间，最新的排在前面
+     3）byRating 按照评分，分高的在前
+genres：电影的流派有romance,documentary,animation,comedy,crime,fantasy,horror,action,war其中的一种，
+     注意全部小写，更多的流派查看movielen dataset的readme,里面所有的流派都可以用，注意要小写
+示例
+http://121.42.174.147:8080/RecommendMovie/getMoviesByPage.action?pageSize=12&pageNow=1&type=byGenres&genres=romance
+
+5用户搜索电影的api
+由于模糊查询会产生多个结果，所以使用分页处理，pageNow当前页数，pageSize每页电影数量，keyWord：用户输入的搜索内容
+http://121.42.174.147:8080/RecommendMovie/getSearchMovieByPage.action?pageNow=1&pageSize=4&keyWord=love
+
+6 用户电影评价
+http://121.42.174.147:8080/RecommendMovie/saveRating.action?userid=1&movie_id=3&rating=5
+返回结果is_rating_success：success数据保存成功，is_rating_success：exception保存失败
+rating:为用户的评价（1-5）
+
+7登录注册
+
+登录
+http://121.42.174.147:8080/RecommendMovie/loginValidation.action?username=1&password=1
+
+注册
+http://121.42.174.147:8080/RecommendMovie/register.action?username=1&password=1
+
+8
+用户完善个人信息
+http://121.42.174.147:8080/RecommendMovie/addUserInfo.action?userid=1&nickname=a&age=1&sex=M&movie_preference=romance%20horror&music_preference=unknown
+
+9 用户头像
+http://121.42.174.147:8080/usersPhoto/
